@@ -4,11 +4,16 @@
    THE WHOLE TIMELINE, IN ONE PLACE
 
      0.00  the plate is opaque, the letters are scattered and invisible
-     0.04  the letters begin arriving, 75 ms apart
-     0.42  the rule draws under them
-     0.56  the line of mono fades up
-     1.15  the plate lifts off the top of the screen
-     1.55  it is hidden, inert, and out of the way for good
+     0.02  the letters begin arriving, 50 ms apart
+     0.25  the rule draws under them
+     0.33  the line of mono fades up
+     0.56  the plate lifts off the top of the screen
+     0.90  it is hidden, inert, and out of the way for good
+
+   It used to run to 1.55 s. The site answers in about 0.8 s, so the back
+   half of that was a splash screen holding a page that was already ready:
+   the reader waited on an animation, not on the site. 0.9 s still reads as
+   a deliberate open rather than a flash, and it no longer costs anything.
 
    Only transform, opacity and clip-path are animated, which is C7.1's list.
 */
@@ -24,7 +29,7 @@
      life, so it can never be the thing between a reader and the page. */
   pointer-events: none;
   clip-path: inset(0 0 0 0);
-  animation: plateLift 400ms cubic-bezier(0.76, 0, 0.24, 1) 1150ms both;
+  animation: plateLift 340ms cubic-bezier(0.76, 0, 0.24, 1) 560ms both;
 }
 
 @keyframes plateLift {
@@ -48,7 +53,7 @@
   gap: 14px;
   /* The lockup leaves a beat before the plate does, so the plate is bare by
      the time it starts to move and the two are not read as one gesture. */
-  animation: lockupOut 260ms var(--pida-ease) 1080ms both;
+  animation: lockupOut 200ms var(--pida-ease) 520ms both;
 }
 
 @keyframes lockupOut {
@@ -80,7 +85,7 @@
   --dx: 0px;
   --dy: 0px;
   --rot: 0deg;
-  animation: letterIn 620ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  animation: letterIn 380ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
 /* Each letter comes in from its own direction. Four hand-set offsets rather
@@ -90,28 +95,28 @@
   --dx: -94px;
   --dy: 40px;
   --rot: -13deg;
-  animation-delay: 40ms;
+  animation-delay: 20ms;
 }
 
 .letter[data-i="1"] {
   --dx: 48px;
   --dy: -66px;
   --rot: 11deg;
-  animation-delay: 115ms;
+  animation-delay: 70ms;
 }
 
 .letter[data-i="2"] {
   --dx: -36px;
   --dy: -52px;
   --rot: 9deg;
-  animation-delay: 190ms;
+  animation-delay: 120ms;
 }
 
 .letter[data-i="3"] {
   --dx: 82px;
   --dy: 46px;
   --rot: -8deg;
-  animation-delay: 265ms;
+  animation-delay: 170ms;
 }
 
 @keyframes letterIn {
@@ -133,7 +138,7 @@
   height: 1px;
   background: var(--pida-edge-strong);
   transform-origin: left center;
-  animation: ruleDraw 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 420ms both;
+  animation: ruleDraw 300ms cubic-bezier(0.2, 0.8, 0.2, 1) 250ms both;
 }
 
 /* The accent square on the end of the rule, as the frame strips carry. */
@@ -166,7 +171,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--pida-fg-faint);
-  animation: lineIn 400ms var(--pida-ease) 560ms both;
+  animation: lineIn 280ms var(--pida-ease) 330ms both;
 }
 
 @keyframes lineIn {

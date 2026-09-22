@@ -58,26 +58,27 @@ export const LABELS = [
 const OPEN_AT = 0.7;
 
 /**
- * The same gate the sheets board uses (C8.4), plus reduced motion. Any no
- * keeps the reader on the static layout: the heading and the three labels,
- * one screen, no runway and no WebGL context. A scrubbed 3D scene is not
- * something to hand a phone, and this component now sits on the home page
- * rather than only on a route someone chose to open.
+ * Can this device be shown the scene?
+ *
+ * It used to say no to every phone, on two counts: a 768px minimum and a
+ * requirement for a fine pointer. The reasoning was that a scrubbed 3D scene
+ * is not something to hand a phone. That was wrong about what the section
+ * is. The three plates ARE the coming-soon section; without them a phone got
+ * a heading and three lines of text where everyone else got the drawing, and
+ * the drawing is the argument.
+ *
+ * Both gates are gone. What is left is the set of real reasons to decline:
+ * the reader asked for less motion, they asked for less data, or the device
+ * cannot do WebGL 2 at all. The stylesheet already had the phone layout
+ * written for it, and scene.ts halves its textures below 768px, so the thing
+ * a phone now runs is a third of the texture memory a laptop does.
+ *
+ * Touch still works without hover: press() latches a plate, which is what
+ * the pointer-up path has always done.
  */
 function capable(): boolean {
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  /* any-pointer, not pointer. A laptop with a touchscreen reports its
-     PRIMARY pointer as coarse even with a mouse plugged in, so `pointer:
-     fine` threw away a large share of real desktops: the scene simply never
-     appeared for them. This asks whether a fine pointer exists at all. */
-  /* 768, which is the breakpoint the rest of this site already turns on.
-     It used to be 1024, and 1024 is a number a great many ordinary browser
-     windows sit just under: a half-screen split, a laptop with a dock, a
-     window nudged in from the edge. Every one of those got no scene at all
-     and no way to know why. */
-  if (!window.matchMedia("(min-width: 768px)").matches) return false;
-  if (!window.matchMedia("(any-pointer: fine)").matches) return false;
 
   const nav = navigator as Navigator & {
     connection?: { saveData?: boolean };

@@ -132,8 +132,18 @@ function texture(c: HTMLCanvasElement, srgb: boolean) {
   return t;
 }
 
-/** The design space every path below is drawn in. */
-const D = 1024;
+/**
+ * The design space every path below is drawn in, and the size of every
+ * texture cut from it.
+ *
+ * Three plates take three maps each, so this number is squared nine times
+ * over in GPU memory: 1024 is about 36 MB before mipmaps. That is ordinary
+ * on a laptop and rude on a phone, and phones are now shown this scene. 512
+ * is a quarter of the memory for a plate that, on a 375px screen, is never
+ * drawn larger than about 340 pixels across. The engraving is line work, so
+ * it loses nothing a reader can see at that size.
+ */
+const D = typeof window !== "undefined" && window.innerWidth < 768 ? 512 : 1024;
 
 /**
  * THE THREE SYMBOLS, TRACED FROM THE FOUNDERS' OWN DRAWINGS.
@@ -779,14 +789,31 @@ export function createAnatomy(
     renderer.setSize(w, h, false);
     const aspect = w / h;
     /* One frustum height for every viewport, so the sheet is the same size
-       relative to the screen on a laptop and on a monitor. Narrow screens
-       get more room, because the separated stack is taller than it is wide
-       once it is projected. */
-    const d = aspect < 1 ? 4.4 / aspect / 1.6 : 4.4;
+       relative to the screen on a laptop and on a monitor.
+
+       PORTRAIT IS ITS OWN PROBLEM, and 1.6 was the wrong answer to it.
+       On a 375 by 812 phone the aspect is 0.46, and dividing by 1.6 left a
+       horizontal half-extent of 2.75 world units against a plate whose
+       silhouette is about 2.4 across. At the zoom the stack runs at, the
+       widest corner of the top plate fell outside the frustum and the
+       drawing was cropped down both sides.
+
+       1.15 gives the width back. It makes the stack smaller on a phone,
+       which is the second thing that needed fixing: at the old size it ran
+       the full height of the pane and the three labels, which sit at the
+       foot of it below 1024px, were printed on top of the drawing. */
+    const portrait = aspect < 1;
+    const d = portrait ? 4.4 / aspect / 1.15 : 4.4;
+
+    /* And sit the stack high in the frame rather than centred, so the lower
+       third belongs to the words. Lowering both edges of the window moves
+       what is in it up the screen. */
+    const lift = portrait ? d * 0.17 : 0;
+
     camera.left = -d * aspect;
     camera.right = d * aspect;
-    camera.top = d;
-    camera.bottom = -d;
+    camera.top = d - lift;
+    camera.bottom = -d - lift;
     camera.updateProjectionMatrix();
   }
 

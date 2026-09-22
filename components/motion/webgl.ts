@@ -52,12 +52,6 @@ export function explain(scene: string): void {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     why.push("reduced motion is on");
   }
-  if (!window.matchMedia("(min-width: 768px)").matches) {
-    why.push(`window is ${window.innerWidth}px, under 768`);
-  }
-  if (!window.matchMedia("(any-pointer: fine)").matches) {
-    why.push("no fine pointer");
-  }
   if (!hasWebGL2()) why.push("no WebGL 2");
   const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
   if (nav.connection?.saveData) why.push("data saver is on");
