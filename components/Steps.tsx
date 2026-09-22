@@ -203,7 +203,7 @@ export default function Steps() {
               <Step
                 n={2}
                 title="The manager"
-                body="A new way to understand P&ID workflow and connectivity, to develop new workflows and improve efficiency."
+                body="A new way to understand P&ID workflow and connectivity."
               >
                 <Media
                   src="/media/pida-manager.mp4"
