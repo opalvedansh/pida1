@@ -32,7 +32,6 @@ export default function Trial() {
     <PlainPage title="Sign up for early access" width="signup" quiet>
       <TrialPanel
         googleHref={signupHref("google")}
-        linkedinHref={signupHref("linkedin")}
       />
 
       <p className={styles.back}>

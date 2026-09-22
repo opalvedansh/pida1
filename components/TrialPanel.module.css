@@ -61,15 +61,7 @@
   background: #f2f2f2;
 }
 
-.provider[data-provider="linkedin"] {
-  background: #0a66c2;
-  color: #ffffff;
-}
 
-.provider[data-provider="linkedin"]:hover,
-.provider[data-provider="linkedin"]:active {
-  background: #004182;
-}
 
 .mark {
   display: flex;
@@ -112,4 +104,38 @@
   .buttons {
     display: none;
   }
+}
+
+/* ------------------------------------------------------- the other door */
+
+/* A rule with a word sitting in it. Two doors to the same room, so neither
+   gets a heading: a heading on one would make the other the fallback. */
+.or {
+  display: flex;
+  align-items: center;
+  gap: var(--pida-space-4);
+  width: 100%;
+  max-width: 320px;
+  margin-top: var(--pida-space-6);
+  font-family: var(--pida-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pida-fg-faint);
+}
+
+.or::before,
+.or::after {
+  content: "";
+  flex: 1 1 0;
+  height: 1px;
+  background: var(--pida-edge);
+}
+
+/* Held to the same measure as the button above it, so the two doors are the
+   same width and read as a pair. */
+.direct {
+  width: 100%;
+  max-width: 320px;
+  margin-top: var(--pida-space-4);
 }

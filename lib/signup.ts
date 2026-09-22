@@ -33,13 +33,12 @@ const site = (process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE).replace(
 /**
  * The address of one provider's sign-in start.
  *
- * `linkedin_oidc` rather than `linkedin`: the older provider is retired and
- * Supabase lists both, but only the OIDC one can still be enabled. Either
- * has to be switched on in the dashboard first, and asking for one that is
- * off answers with an error page rather than a provider.
+ * Google is the only provider. LinkedIn was here and is gone: it was never
+ * switched on in the project, so the button answered 400 every time it was
+ * pressed. The name and email form beside it covers the people who would
+ * have used it, and covers everyone with neither account.
  */
-export function signupHref(provider: "google" | "linkedin"): string {
-  const name = provider === "linkedin" ? "linkedin_oidc" : provider;
+export function signupHref(provider: "google"): string {
   const back = encodeURIComponent(`${site}/trial/welcome`);
-  return `${supabaseUrl}/auth/v1/authorize?provider=${name}&redirect_to=${back}`;
+  return `${supabaseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${back}`;
 }

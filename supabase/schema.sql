@@ -47,3 +47,45 @@ create policy "anyone may ask a question"
 -- Newest first is the only way this is ever read.
 create index if not exists questions_created_at_idx
   on public.questions (created_at desc);
+
+
+-- The early access list.
+--
+-- Not auth.users. There is no account here: no password, no verification,
+-- nothing to sign in to. Someone who presses Continue with Google ends up in
+-- auth.users because Supabase puts them there; someone who types their name
+-- and address ends up here. Two lists, read with two queries.
+--
+-- Same one-way grant as public.questions, and for the same reason: the
+-- publishable key is public, so insert is all the anonymous role gets. With
+-- no select policy nobody can read the list back, which matters more here
+-- than it does for questions. A readable table of names and work addresses
+-- at a named company is a lead list for whoever asks for it first.
+
+create table if not exists public.signups (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null check (char_length(name) between 1 and 120),
+  email text not null check (char_length(email) between 3 and 320)
+);
+
+-- Signing up twice is not an error, and the form treats the 409 this raises
+-- as success. Lowercased, so one address is one row whatever case it is
+-- typed in.
+create unique index if not exists signups_email_key
+  on public.signups (lower(email));
+
+alter table public.signups enable row level security;
+
+revoke all on public.signups from anon, authenticated;
+grant insert (name, email) on public.signups to anon, authenticated;
+
+drop policy if exists "anyone may join the list" on public.signups;
+create policy "anyone may join the list"
+  on public.signups
+  for insert
+  to anon, authenticated
+  with check (true);
+
+create index if not exists signups_created_at_idx
+  on public.signups (created_at desc);

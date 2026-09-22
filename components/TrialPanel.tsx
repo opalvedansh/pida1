@@ -23,16 +23,15 @@
  * Nothing here says what the trial delivers, how long it lasts or when the
  * person will hear back: that decision is open (0.6, D1).
  */
+import EarlyAccessForm from "./EarlyAccessForm";
 import styles from "./TrialPanel.module.css";
 
 type Props = {
-  /** Where the first provider button goes (C3.6). */
+  /** Where the provider button goes (C3.6). */
   googleHref: string;
-  /** Where the second provider button goes (C3.6). */
-  linkedinHref: string;
 };
 
-export default function TrialPanel({ googleHref, linkedinHref }: Props) {
+export default function TrialPanel({ googleHref }: Props) {
   return (
     <div className={styles.panel}>
       <div className={styles.buttons} data-pida="provider-group">
@@ -64,26 +63,18 @@ export default function TrialPanel({ googleHref, linkedinHref }: Props) {
           </span>
           Continue with Google
         </a>
-
-        <a
-          className={styles.provider}
-          href={linkedinHref}
-          data-pida="provider"
-          data-provider="linkedin"
-        >
-          <span className={styles.mark} aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20" focusable="false">
-              <rect width="24" height="24" rx="2" fill="#ffffff" />
-              <path
-                fill="#0a66c2"
-                d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45z"
-              />
-            </svg>
-          </span>
-          Continue with LinkedIn
-        </a>
       </div>
 
+      {/* The other way in. "or" rather than a heading: these are two doors to
+          the same room, and giving one of them a heading would make it the
+          fallback rather than the equal it is. */}
+      <p className={styles.or} aria-hidden="true">
+        or
+      </p>
+
+      <div className={styles.direct}>
+        <EarlyAccessForm />
+      </div>
     </div>
   );
 }
