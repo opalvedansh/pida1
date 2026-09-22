@@ -18,20 +18,17 @@
 import styles from "./Footer.module.css";
 
 const product = [
-  { href: "/#pid-making", label: "P&ID Generator" },
-  { href: "/#connectivity", label: "Connectivity" },
-  { href: "/#hydraulics", label: "Hydraulics" },
-  { href: "/#answers", label: "Engineering Answers" },
+  { href: "/#pid-making", label: "The tools" },
+  { href: "/#next-sheets", label: "Coming soon" },
 ];
 
 const company = [
   { href: "/#faq", label: "Questions" },
-  { href: "/trial", label: "Sign up for trial" },
+  { href: "/trial", label: "Sign up for early access" },
 ];
 
 const legal = [
   { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Trial terms" },
   { href: "/legal", label: "Legal and accessibility" },
 ];
 
@@ -47,9 +44,6 @@ export default function Footer() {
               <span className={styles.mark} aria-hidden="true" />
               <span className={styles.wordmark}>PIDA</span>
             </span>
-            <p className={styles.tagline}>
-              Early process design for pharma plants, automated and traceable.
-            </p>
           </div>
 
           <nav className={styles.col} aria-label="Product">

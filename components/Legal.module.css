@@ -1,0 +1,90 @@
+/* The prose on the three legal pages.
+ *
+ * base.css resets margins and list markers to nothing, which is right for a
+ * landing page built out of components and wrong for a page that is only
+ * running text. This puts them back, once, for the three pages that need it.
+ *
+ * Everything here is measure and rhythm. No colour that is not already a
+ * token, no rules, no boxes: these are pages people read when something has
+ * gone wrong or when they want to check one thing, and the only job is to
+ * let them find it. */
+
+.prose {
+  width: 100%;
+  /* Shorter than the 65ch of a marketing paragraph. Legal text is scanned
+     for one clause, not read through, and a shorter line is easier to jump
+     back to the start of. */
+  max-width: 62ch;
+}
+
+.updated {
+  color: var(--pida-fg-faint);
+}
+
+.lede {
+  margin-top: var(--pida-space-5);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--pida-fg);
+}
+
+.section {
+  margin-top: var(--pida-space-8);
+}
+
+.h2 {
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(19px, 1.5vw, 22px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--pida-fg);
+}
+
+.p,
+.list {
+  margin-top: var(--pida-space-4);
+}
+
+.p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--pida-fg-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-2);
+}
+
+/* A marker drawn rather than a list-style, because base.css takes the
+   markers off everywhere and putting them back globally would change every
+   other list on the site. */
+.item {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--pida-fg-muted);
+}
+
+.item::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  /* Half the line box, less half the dot, so it sits on the first line's
+     centre at any size rather than drifting with the font. */
+  top: calc(0.85em - 2px);
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--pida-action);
+}
+
+.back {
+  margin-top: var(--pida-space-9);
+  padding-top: var(--pida-space-5);
+  border-top: 1px solid var(--pida-edge);
+  font-size: 14px;
+}

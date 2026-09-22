@@ -17,19 +17,19 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   // A7.2 fixes the title. The description is B15.1. Outside the two button
   // labels, nothing on this page or in its metadata names a sign-in provider.
-  title: "Sign up for trial | PIDA",
+  title: "Sign up for early access | PIDA",
   description: "Sign up for a PIDA trial with an account you already have.",
   openGraph: {
     siteName: "PIDA",
     type: "website",
-    title: "Sign up for trial | PIDA",
+    title: "Sign up for early access | PIDA",
     description: "Sign up for a PIDA trial with an account you already have.",
   },
 };
 
 export default function Trial() {
   return (
-    <PlainPage eyebrow="PIDA trial" title="Sign up for trial" width="signup">
+    <PlainPage title="Sign up for early access" width="signup" quiet>
       <TrialPanel
         googleHref={signupHref("google")}
         linkedinHref={signupHref("linkedin")}

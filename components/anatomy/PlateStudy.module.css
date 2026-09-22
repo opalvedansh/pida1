@@ -1,0 +1,150 @@
+/* The study page. Two columns on a desk-sized screen, the plate stacked over
+   the words below that. It borrows the landing page's ground and its smoke
+   field so the plate is judged against the surface it will actually sit on,
+   not against a flat swatch. */
+
+.page {
+  min-height: 100dvh;
+  display: grid;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  padding: clamp(28px, 5vh, 64px) var(--pida-margin);
+  background-color: var(--pida-bg-sunken);
+  background-image: url("/media/smoke-field.webp");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+  background-blend-mode: screen;
+}
+
+@media (min-width: 900px) {
+  .page {
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.85fr);
+  }
+}
+
+/* ------------------------------------------------------------- the plate */
+
+.stage {
+  position: relative;
+  /* Square, because the plate is square and turning: any other ratio crops a
+     corner at one end of the sway and leaves a gap at the other. */
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-height: 78dvh;
+  margin-inline: auto;
+}
+
+.canvas {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas[data-ready] {
+  display: block;
+}
+
+/* ------------------------------------------------------------- the words */
+
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(18px, 3vh, 30px);
+  max-width: 42ch;
+}
+
+.eyebrow {
+  color: var(--pida-fg-faint);
+}
+
+/* The other end of the same target as the plate: hovering here lights the
+   engraving, so it has to look like something that answers. */
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+  border-left: 1px solid var(--pida-edge);
+  cursor: pointer;
+  transition: border-color 200ms var(--pida-ease);
+}
+
+.label:hover {
+  border-color: var(--pida-action);
+}
+
+.tag {
+  color: var(--pida-action);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: var(--pida-fg);
+  text-wrap: balance;
+  transition: color 200ms var(--pida-ease);
+}
+
+.label:hover .title {
+  color: var(--pida-action);
+}
+
+/* ---------------------------------------------------------- the switcher */
+
+.switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pick {
+  padding: 8px 14px;
+  font-family: var(--pida-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pida-fg-faint);
+  background: transparent;
+  border: 1px solid var(--pida-edge);
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    color 160ms var(--pida-ease),
+    border-color 160ms var(--pida-ease),
+    transform 90ms var(--pida-ease);
+}
+
+.pick:hover {
+  color: var(--pida-fg);
+  border-color: var(--pida-edge-strong);
+}
+
+.pick:active {
+  transform: translateY(1px);
+}
+
+.pick[data-on] {
+  color: var(--pida-action);
+  border-color: var(--pida-action-edge);
+  background: var(--pida-action-wash);
+}
+
+/* ------------------------------------------------------------- the note */
+
+.note {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pida-fg-muted);
+}
+
+.cold {
+  color: var(--pida-ink-cold);
+}

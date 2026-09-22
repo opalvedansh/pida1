@@ -7,12 +7,16 @@
  *
  * THE COMPOSITION
  *
- * Two layers share one pinned viewport. The sheet starts oversized, tilted
- * and dim, sitting behind the copy so the first frame is a drawing out of
- * focus rather than an empty black box. As the reader scrolls it settles to
- * its rest size while the copy dollies past the camera and fades out. One
- * move, and it is motivated: the claim is stated, then the artefact that has
- * to back it fills the screen.
+ * Two layers share one pinned viewport. The copy sits hard to the top left.
+ * Behind it, filling the whole pane, is a lattice of pipe growing a segment
+ * at a time, which is the one piece of decoration on this site that is also
+ * its subject. As the reader scrolls, the copy leaves through the camera and
+ * the lattice zooms past and fades out into the section below.
+ *
+ * The layer that does the zooming used to hold the generated sheet, and the
+ * file for it does not exist, so it was an empty dashed box. The pipes have
+ * taken its place and its move with it: components/motion/heroStage.ts drives
+ * whatever is marked [data-pida-hero-sheet] and does not care what is in it.
  *
  * WHAT IS NOT COPIED FROM THE REFERENCE
  *
@@ -39,7 +43,7 @@
  * hero with the sheet sitting under the copy and nothing hidden.
  */
 import { ArrowDownIcon, CrosshairSimpleIcon } from "@phosphor-icons/react/dist/ssr";
-import MediaPlaceholder from "./MediaPlaceholder";
+import Pipes from "./hero/Pipes";
 import styles from "./Hero.module.css";
 
 export default function Hero() {
@@ -50,18 +54,18 @@ export default function Hero() {
           <div className={styles.copy}>
             <p className="eyebrow" data-pida-hero-intro>
               <CrosshairSimpleIcon size={14} weight="bold" aria-hidden="true" />
-              Built for pharma process engineers
+              Built for pharma engineers
             </p>
 
             <h1 className={`wash ${styles.headline}`} data-pida-hero-intro>
-              Pharma process design,
+              Pharma industry design,
               <br className={styles.headlineBreak} />{" "}
               <span className="accent-word">reimagined</span>.
             </h1>
 
             <p className={styles.sub} data-pida-hero-intro>
               A P&amp;ID in 30 seconds. A hydraulic model in under a minute.
-              Every value traceable to its source.
+              And many more.
             </p>
 
             <div className={styles.actions} data-pida-hero-intro>
@@ -70,7 +74,7 @@ export default function Hero() {
                 href="/trial"
                 data-pida="cta"
               >
-                Sign up for trial
+                Sign up for early access
               </a>
 
               <a
@@ -84,22 +88,16 @@ export default function Hero() {
           </div>
         </section>
 
-        {/* The scrim sits between the two layers: it darkens the bottom of
-            the sheet so the copy stays legible over it at rest, and it hands
-            the pane off to the band below without ending on a hard line. */}
+        {/* The scrim takes the bottom of the pane down to the band below,
+            so the hero hands over without ending on a hard line. */}
         <div className={styles.scrim} aria-hidden="true" />
 
+        {/* The artefact layer. It holds the whole pane at rest and then
+            zooms through the camera and fades as the reader scrolls, which
+            is the move heroStage.ts drives. What is in it is the growing
+            pipe lattice; see hero/Pipes.tsx. */}
         <div className={styles.sheetLayer} data-pida-hero-sheet>
-          <div className={styles.bezel}>
-            <MediaPlaceholder
-              id="M2"
-              file="pida-generated-pid-r101.png"
-              strip="PIDA / Sheet R-101"
-              ratio="4 / 3"
-              caption=""
-              alt="A generated P&ID sheet for reactor R-101: a reactor with a spark filter train, instruments, valves and a title block."
-            />
-          </div>
+          <Pipes />
         </div>
       </div>
     </div>

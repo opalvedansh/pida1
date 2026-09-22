@@ -405,3 +405,39 @@
 .strip:hover .stripArrow {
   transform: translateX(2px);
 }
+
+/* ------------------------------------------------------------ touch
+ *
+ * A finger is about 44px across. The menu button was 40 and the accent
+ * strip, which is the page's one conversion, was 32 tall. Both are hit
+ * targets on a phone before they are anything else. */
+@media (max-width: 767px) {
+  .menuButton {
+    width: 44px;
+    height: 44px;
+  }
+
+  .chip,
+  .chipPrimary {
+    height: 44px;
+    padding-inline: 16px;
+  }
+
+  /* The sheet is the whole of the navigation on a phone, so every row in it
+     is a finger-sized target rather than a line of type. */
+  .sheetAnchors a,
+  .sheetLegal a {
+    display: block;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  .brand {
+    min-height: 44px;
+  }
+
+  .strip {
+    min-height: 44px;
+    padding-block: 15px 12px;
+  }
+}

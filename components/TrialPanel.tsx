@@ -35,11 +35,6 @@ type Props = {
 export default function TrialPanel({ googleHref, linkedinHref }: Props) {
   return (
     <div className={styles.panel}>
-      <p className={`body-l measure ${styles.lede}`}>
-        Use an account you already have. There is no password to create. We
-        will email you with the next step.
-      </p>
-
       <div className={styles.buttons} data-pida="provider-group">
         <a
           className={styles.provider}
@@ -89,33 +84,6 @@ export default function TrialPanel({ googleHref, linkedinHref }: Props) {
         </a>
       </div>
 
-      <p className={`small ${styles.consent}`}>
-        By continuing you agree to the{" "}
-        <a className="link" href="/terms">
-          Trial terms
-        </a>{" "}
-        and the{" "}
-        <a className="link" href="/privacy">
-          Privacy notice
-        </a>
-        .
-      </p>
-
-      <p className={`small measure ${styles.data}`}>
-        We keep your name and email address from the account you choose, and
-        use them to contact you about the PIDA trial. We do not keep a profile
-        picture.
-      </p>
-
-      <hr className={`rule ${styles.hairline}`} />
-
-      <p className={`mono-label ${styles.assurance}`}>
-        <span>No password to create</span>
-        <span className={styles.slash} aria-hidden="true">
-          /
-        </span>
-        <span>Your documents stay yours</span>
-      </p>
     </div>
   );
 }

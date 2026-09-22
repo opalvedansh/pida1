@@ -1,5 +1,5 @@
 /**
- * The one template behind the small pages: /privacy, /terms, /legal, /trial,
+ * The one template behind the small pages: /privacy, /legal, /trial,
  * /trial/welcome, /trial/error and /404 (A6.16, C6.4).
  *
  * Paper band, full height, the same bar and footer as the home page. One
@@ -15,12 +15,14 @@
 import styles from "./PlainPage.module.css";
 
 type Props = {
-  /** Mono eyebrow above the h1. */
-  eyebrow: string;
+  /** Mono eyebrow above the h1. Omitted where the page carries no header. */
+  eyebrow?: string;
   /** The one h1 of the page. */
   title: string;
   /** Sign-up pages take the narrower 5-column measure (A6.16). */
   width?: "text" | "signup";
+  /** Keep the h1 in the document but out of the page. */
+  quiet?: boolean;
   children: React.ReactNode;
 };
 
@@ -28,6 +30,7 @@ export default function PlainPage({
   eyebrow,
   title,
   width = "text",
+  quiet = false,
   children,
 }: Props) {
   return (
@@ -44,8 +47,10 @@ export default function PlainPage({
               width === "signup" ? styles.signup : styles.text
             }`}
           >
-            <p className={`mono-label ${styles.eyebrow}`}>{eyebrow}</p>
-            <h1 className="display-l">{title}</h1>
+            {eyebrow && (
+              <p className={`mono-label ${styles.eyebrow}`}>{eyebrow}</p>
+            )}
+            <h1 className={quiet ? "visually-hidden" : "display-l"}>{title}</h1>
             {children}
           </div>
         </div>

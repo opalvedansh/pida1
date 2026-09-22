@@ -11,6 +11,13 @@
  * of them repeats the numbered index the product rail owns.
  */
 
+/* The same figure column as the steps rail, and for the same reason: two
+   1919px screenshots side by side inside a 90rem container are 645px each,
+   which is not enough pixels to read a value off. */
+.section :global(.container) {
+  max-width: min(96vw, 112rem);
+}
+
 .section {
   border-bottom: 1px solid var(--pida-edge);
 }
@@ -19,6 +26,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--pida-space-5);
+  /* The words keep the reading measure even though the figures below them
+     do not. */
+  max-width: 90rem;
+  margin-inline: auto;
   margin-bottom: clamp(40px, 5vw, 72px);
 }
 
@@ -62,13 +73,6 @@
     grid-template-columns: 5fr 7fr;
   }
 
-  /* The first plate gives the narrower half to its figure, not the wider
-     one. At seven columns the 16:9 frame stood 423px tall against 290px of
-     text beside it, so the plate was mostly an empty media box with a hole
-     under the paragraph. At five the two columns come out close to level. */
-  .splitFigure {
-    grid-template-columns: 7fr 5fr;
-  }
 }
 
 .copy {
@@ -100,6 +104,27 @@
 .figure {
   min-width: 0;
 }
+
+/* The two solver stills, side by side. They are a pair and read as one
+   statement, so they share a row on anything wide enough to hold two
+   frames and stack in order below that. */
+.pair {
+  display: grid;
+  gap: clamp(20px, 2.4vw, 32px);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* The two are one statement in two frames, so they are the same size.
+       They get there by sharing one aspect ratio, set on the frames
+       themselves, rather than by being stretched to match: a stretched well
+       has no height of its own, and when the row had nothing else setting
+       one, both collapsed to zero. */
+  }
+}
+
 
 /* --------------------------------------------------- the value plate
  *

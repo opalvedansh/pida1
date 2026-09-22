@@ -46,7 +46,8 @@
  */
 import { useRef, useState } from "react";
 import { PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr";
-import { askEndpoint } from "@/lib/ask";
+import { askEndpoint, askHeaders } from "@/lib/ask";
+import { supabaseHeaders } from "@/lib/supabase";
 import styles from "./AskQuestion.module.css";
 
 type State = "idle" | "sending" | "sent" | "failed";
@@ -65,14 +66,15 @@ export default function AskQuestion() {
     setState("sending");
 
     try {
+      /* JSON, because PostgREST takes JSON. The form's own fields are the
+         table's own columns, so the body is the form, converted. */
       const res = await fetch(askEndpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Accept: "application/json",
-        },
-        body: new URLSearchParams(
-          Array.from(new FormData(form), ([k, v]) => [k, String(v)])
+        headers: { ...supabaseHeaders, ...askHeaders },
+        body: JSON.stringify(
+          Object.fromEntries(
+            Array.from(new FormData(form), ([k, v]) => [k, String(v)])
+          )
         ),
       });
       if (!res.ok) throw new Error(String(res.status));
@@ -121,11 +123,6 @@ export default function AskQuestion() {
           stopped meaning anything when the six written answers were removed
           and this became the whole of the section. The section's own heading
           asks for the question; this only has to say where it goes. */}
-      <p className={styles.lede}>
-        Your question reaches the team, and your address is used to reply to
-        it and nothing else.
-      </p>
-
       <div className={styles.field}>
         <label className={styles.label} htmlFor="ask-question">
           Your question
@@ -152,16 +149,8 @@ export default function AskQuestion() {
           className={styles.input}
           autoComplete="email"
           required
-          aria-describedby="ask-privacy"
           disabled={state === "sending"}
         />
-        <p id="ask-privacy" className={styles.help}>
-          We keep it only to answer you. See the{" "}
-          <a className="link" href="/privacy">
-            Privacy notice
-          </a>
-          .
-        </p>
       </div>
 
       {/* Which surface the question came from, for whoever reads them. */}

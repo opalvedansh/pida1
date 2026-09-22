@@ -1,10 +1,10 @@
 /**
- * The sheet, exploded.
+ * What is coming, exploded.
  *
  * A standalone route, not part of the landing page's block order. It exists
- * to show one thing: that the printed sheet, the routed model, the flow
- * paths and the P&ID underneath them are four faces of one artifact rather
- * than four files that have to be kept in step.
+ * to show one thing: that the three pieces PIDA does not do yet come out of
+ * the model it already builds, rather than being three more files that have
+ * to be kept in step.
  *
  * It is a Server Component. The scene and the scroll binding are the one
  * Client Component below it, and Three.js is imported from inside that
@@ -15,15 +15,15 @@ import type { Metadata } from "next";
 import Anatomy from "@/components/anatomy/Anatomy";
 
 export const metadata: Metadata = {
-  title: "PIDA | One sheet, four layers",
+  title: "PIDA | Coming soon",
   description:
-    "The printed sheet, the routed model, the flow paths and the P&ID underneath them are one artifact, not four files kept in step by hand.",
+    "Three more pieces out of the same model as the drawing: the routed 3D model, relief scenario analysis with PSV calculation, and assisted engineering documentation.",
   openGraph: {
     siteName: "PIDA",
     type: "website",
-    title: "One sheet, four layers",
+    title: "Coming soon",
     description:
-      "The printed sheet, the routed model, the flow paths and the P&ID underneath them are one artifact.",
+      "Three more pieces out of the same model as the drawing: the routed 3D model, relief scenario analysis with PSV calculation, and assisted engineering documentation.",
   },
 };
 

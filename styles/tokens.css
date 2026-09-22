@@ -60,6 +60,14 @@
 
   /* ------------------------------------------------------------- accent
      One accent for the whole page (accent lock). */
+  /* The engraving at rest, when the plate is set to heat on hover rather
+     than to sit at the accent. A cool white rather than the neutral --pida-fg:
+     the whole point of the transition is cold metal going hot, and a chroma-0
+     grey warming to #ff3616 travels half the distance a faintly blue one
+     does. It is the one place on the site that is allowed off the neutral
+     axis, and it is off it by about two points of chroma. */
+  --pida-ink-cold: #dce3e8;
+
   --pida-action: #ff3616;
   --pida-action-soft: #ff5a33;
   --pida-action-wash: rgba(255, 54, 22, 0.12);
@@ -109,6 +117,10 @@
   --pida-font-body: "Funnel Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
   --pida-font-accent: "Bodoni Moda", Georgia, "Times New Roman", serif;
+  /* The wordmark only. A condensed display face, which is what the
+     handoff names for it and what a wordmark wants: narrow, even and
+     it holds its shape at any size. */
+  --pida-font-mark: "Tenada", "Funnel Display", ui-sans-serif, sans-serif;
   --pida-font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas,
     monospace;
 

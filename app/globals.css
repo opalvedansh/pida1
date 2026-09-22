@@ -21,6 +21,18 @@
 @import "../styles/tokens.css";
 @import "../styles/base.css";
 
+/* THE WORDMARK FACE. Subset to the four letters it ever draws, which takes
+   it from a 1 MB TTF to a 752 byte woff2. `swap` rather than `block`: the
+   preloader is the first thing painted and it must not wait on a font. */
+@font-face {
+  font-family: "Tenada";
+  src: url("/fonts/tenada-pida.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 /* The bar is sticky, not fixed, so it occupies real layout space and needs
    no clearance on main. The only thing that hangs into the page is the
    accent strip behind the pill, which is about 28px deep; each page's first

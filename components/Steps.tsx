@@ -26,7 +26,6 @@
  *   a well panel holding the figure, with a text card nested in its foot at
  *   a 6px inset, carrying the title, a four-bar step meter and the body;
  *
- *   faint circuit traces down both margins.
  *
  * WHAT GOES IN THE PANELS
  *
@@ -40,33 +39,8 @@
  * already carries the sequence for anything that is not looking at it.
  */
 import { CrosshairSimpleIcon } from "@phosphor-icons/react/dist/ssr";
-import MediaPlaceholder from "./MediaPlaceholder";
+import Media from "./Media";
 import styles from "./Steps.module.css";
-
-const wizard = [
-  "Equipment",
-  "Spark filter",
-  "Inlets",
-  "Outlets",
-  "Solids & cleaning",
-  "Utilities",
-  "Instrumentation",
-  "Controlled streams",
-  "Review",
-];
-
-const deliverables = [
-  "Independent check report",
-  "Redline drawing",
-  "Line list",
-  "Valve list",
-  "Instrument index",
-  "HAZOP starter",
-  "Isolation plan",
-  "Flow paths as PDF layers",
-  "Hashed revision chain",
-  "DEXPI export",
-];
 
 /**
  * Four segments, n of them lit. It used to sit in the corner of the text
@@ -84,50 +58,18 @@ function Meter({ step }: { step: number }) {
   );
 }
 
-/** The faint trace bundle that runs down a margin. */
-function Traces({ side }: { side: "left" | "right" }) {
-  return (
-    <svg
-      className={`${styles.traces} ${styles[side]}`}
-      /* Parallax, a deviation from A6.10. These are the one thing in the
-         section with nothing aligned to them, so they can drift without
-         pulling anything out of register. */
-      data-pida-parallax="40"
-      viewBox="0 0 160 1600"
-      width="160"
-      height="1600"
-      aria-hidden="true"
-    >
-      <g fill="none" stroke="currentColor" strokeLinejoin="round">
-        <path d="M24 0 V420 L64 460 V975" />
-        <path d="M56 0 V300 L96 340 V755" />
-        <path d="M88 0 V180 L128 220 V535" />
-        <path d="M40 1600 V1300 L80 1260 V1085" />
-      </g>
-      <g fill="currentColor">
-        <rect x="61" y="975" width="6" height="6" rx="1" />
-        <rect x="93" y="755" width="6" height="6" rx="1" />
-        <rect x="125" y="535" width="6" height="6" rx="1" />
-        <rect x="77" y="1079" width="6" height="6" rx="1" />
-        <rect x="22.5" y="598" width="3" height="3" rx="0.5" />
-        <rect x="62.5" y="640" width="3" height="3" rx="0.5" />
-        <rect x="94.5" y="470" width="3" height="3" rx="0.5" />
-        <rect x="126.5" y="330" width="3" height="3" rx="0.5" />
-        <rect x="38.5" y="1420" width="3" height="3" rx="0.5" />
-      </g>
-    </svg>
-  );
-}
-
 function Step({
   n,
   title,
   body,
+  note,
   children,
 }: {
   n: number;
   title: string;
   body: React.ReactNode;
+  /** One line of real figures under the body, where the tool has any. */
+  note?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -137,16 +79,34 @@ function Step({
           rule runs on into the gap below, so the four steps read as one
           continuous datum rather than four detached blocks.
 
-          data-active on the first ordinal is the state with no JavaScript:
-          step 01 is lit and the rest are quiet. Once the pinned sequence is
-          running it sets data-pida-active on the <li> instead, and the
-          stylesheet prefers that. */}
+          The ordinal and its meter live inside a square box, and the box is
+          what the rail runs into. See .box in the stylesheet for why that
+          one background is the whole of the splitting effect.
+
+          data-active is the state with no JavaScript: step 01 is lit and the
+          rest are quiet. Once the pinned sequence is running it sets
+          data-pida-passed on the <li> instead, and the stylesheet prefers
+          that. */}
       <div className={styles.index} aria-hidden="true">
-        <span className={styles.ordinal} data-active={n === 1 ? "true" : undefined}>
-          {String(n).padStart(2, "0")}
+        <span
+          className={styles.box}
+          data-pida="step-box"
+          data-active={n === 1 ? "true" : undefined}
+        >
+          <span
+            className={styles.ordinal}
+            data-active={n === 1 ? "true" : undefined}
+          >
+            {String(n).padStart(2, "0")}
+          </span>
+          <Meter step={n} />
         </span>
-        <Meter step={n} />
-        {n < 4 && <span className={styles.indexRule} />}
+        {/* On every step, including the last. The run carries on past box 04
+            to the foot of the section, and without a rule under that box it
+            was tracing over nothing: a lit line and a spark hanging in the
+            dark. The stylesheet stops the last one at the foot of its own
+            step rather than in the gap to a step that is not there. */}
+        <span className={styles.indexRule} />
       </div>
 
       <div className={styles.content}>
@@ -168,6 +128,7 @@ function Step({
           <div className={styles.card}>
             <h3 className={styles.cardTitle}>{title}</h3>
             <p className={styles.cardBody}>{body}</p>
+            {note && <p className={`mono-data ${styles.cardNote}`}>{note}</p>}
             <span className={styles.cardSheen} aria-hidden="true" />
           </div>
         </div>
@@ -188,111 +149,106 @@ export default function Steps() {
         <header className={styles.head}>
           <p className="eyebrow" data-pida-reveal="text">
             <CrosshairSimpleIcon size={14} weight="bold" aria-hidden="true" />
-            Product
+            Built and working
           </p>
 
           <h2 className="display-l wash" data-pida-reveal="text">
-            From a blank sheet to a
-            <br />
-            checked package in{" "}
-            <span className="accent-word">four steps</span>.
+            Our <span className="accent-word">tools</span>.
           </h2>
 
           <p
             className={`sub-headline ${styles.headSub}`}
             data-pida-reveal="text"
           >
-            We take nine short answers, draw the sheet, check it against
-            itself, and write the whole deliverables package beside it.
+            Four of them, working today, over one record. Each reads from
+            the same design data, so the whole project is internally
+            consistent.
           </p>
         </header>
 
         <div className={styles.rail} data-pida="rail">
-          <Traces side="left" />
-          <Traces side="right" />
+          {/* The rail. One continuous line down the index column, filled to
+              wherever the reader has got to. While the pinned sequence is
+              running it reads that sequence's own progress, so the fill and
+              the ordinals lighting are the same measurement; with no script
+              it fills against its own passage through the viewport. */}
+          <span
+            className={styles.rail_}
+            data-pida="rail-run"
+            aria-hidden="true"
+          >
+            <span className={styles.railFill} />
+          </span>
 
           {/* The frame is the window the pinned sequence scrolls the list
               through. It is an ordinary wrapper with no height of its own;
               only while the section is pinned does the motion layer give it
               a viewport height and an overflow, so the layout here and the
-              layout below 1024px are untouched by any of this. The traces
-              sit outside it, in the margins, so they are never clipped. */}
+              layout below 1024px are untouched by any of this. */}
             <div className={styles.frame} data-pida="step-frame">
               <ol className={styles.list} data-pida="step-list">
               <Step
                 n={1}
-                title="Answer nine short steps"
-                body="Equipment, spark filter, inlets, outlets, solids and cleaning, utilities, instrumentation, controlled streams, review. Short answers, in the words an engineer already uses. No symbol library and no drafting."
+                title="The generator"
+                body="A process specification goes in and a valid, standards-compliant P&ID comes out in under thirty seconds."
               >
-                <ul className={styles.chips}>
-                  {wizard.map((c) => (
-                    <li key={c} className={styles.wizardChip} data-pida="chip">
-                      {c}
-                    </li>
-                  ))}
-                </ul>
+                <Media
+                  src="/media/pida-input-output.mp4"
+                  ratio="1920 / 1080"
+                  strip="PIDA / Generator"
+                  alt="A process specification going into the generator and a finished P&ID sheet coming out, with the deliverables written beside it."
+                />
               </Step>
 
               <Step
                 n={2}
-                title="Watch the schematic build"
-                body={
-                  <>
-                    The drawing assembles beside you as you answer, under one
-                    sentence: &ldquo;This is exactly what will be drawn.&rdquo;
-                    There is no gap between what you reviewed and what arrives.
-                  </>
-                }
+                title="The manager"
+                body="A new way to understand P&ID workflow and connectivity, to develop new workflows and improve efficiency."
               >
-                {/* No ratio override, so this takes the component's 16/10.
-                    The 4/3 it used to carry was sized for a 22rem panel; in a
-                    panel twice that wide it stands 600px tall and swamps the
-                    other three steps. The handoff marks every ratio here
-                    provisional and to be measured off the real file (0.3), and
-                    what this frame shows, a step list beside a live schematic,
-                    is a wide picture. */}
-                <MediaPlaceholder
-                  id="M1"
-                  file="pida-generator-review.png"
-                  caption=""
-                  alt="The P&ID Generator at its review step. A nine-step list on the left, a live schematic of the reactor and spark filter train on the right, under the sentence: This is exactly what will be drawn. The independent check reads PASS."
+                <Media
+                  src="/media/pida-manager.mp4"
+                  ratio="1920 / 1080"
+                  strip="PIDA / Manager"
+                  alt="The manager holding a project's drawings, each with its specification, checks, deliverables and revision history."
                 />
               </Step>
 
               <Step
                 n={3}
-                title="Generate, and it checks itself"
-                body="Press Generate and PIDA draws the P&ID as a DXF, then checks it independently and writes a redline. The same specification always produces the same drawing, byte for byte."
+                title="The workspace"
+                body="Flow paths automated, and compatible with the industrial software already in use, Bluebeam Revu among them."
+                note="Ask about the drawing in front of you and it answers in plain words, on the sheet."
               >
-                {/* The verdict as the run report writes it, set as type. A
-                    quotation of a result, not a picture of one. */}
-                <div className={styles.verdict}>
-                  <span className={`mono-label ${styles.verdictLabel}`}>
-                    Independent check
-                  </span>
-                  <p className={`${styles.verdictFigure} tabular`}>
-                    PASS
-                  </p>
-                  <p className={`${styles.verdictDetail} tabular`}>
-                    0 error, 0 warning
-                  </p>
-                  <p className={styles.verdictNote}>
-                    From one real run. It describes that run, not every project.
-                  </p>
-                </div>
+                <Media
+                  src="/media/pida-flow-paths.mp4"
+                  ratio="1314 / 872"
+                  strip="PIDA / Workspace, flow path"
+                  alt="A line picked on the drawing and its flow path traced across the sheet, listing what it runs between, the equipment it serves and the valves along it."
+                />
+
+                {/* Isolation is the workspace's other tab, not another tool,
+                    so it sits in this step rather than in one of its own. */}
+                <Media
+                  src="/media/pida-isolation.png"
+                  ratio="1914 / 960"
+                  strip="PIDA / Workspace, isolation"
+                  alt="The isolation view of the same workspace: the valves that close to take Reactor 1 out of service, listed and ringed on the drawing, with the lines that leave the sheet first called out."
+                />
               </Step>
 
               <Step
                 n={4}
-                title="Take the whole package"
-                body="The line list, valve list and instrument index are written from the same model as the drawing, so the copies cannot drift apart. One real run listed 12 lines, 28 valves and 23 instruments."
+                title="The Engineer"
+                body="The PIDA engineering assistant answers from standards, guidelines, collected vendor data and PIDA’s own rules. Every number is cited to its source, which is what separates it from a general assistant."
               >
-                <ul className={styles.deliverables}>
-                  {deliverables.map((d) => (
-                    <li key={d}>{d}</li>
-                  ))}
-                </ul>
+                <Media
+                  src="/media/pida-engineer.mp4"
+                  ratio="1920 / 1080"
+                  strip="PIDA / Engineer"
+                  alt="The Engineer answering a process design question from the documents it holds, with the clause and page of each source shown beside the answer."
+                />
               </Step>
+
             </ol>
           </div>
         </div>

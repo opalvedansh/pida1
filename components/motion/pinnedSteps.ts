@@ -1,151 +1,129 @@
 /**
- * The one pinned sequence of the site.
+ * The rail beside the four tools.
  *
- * A6.10 and C7.1 both allow exactly one, and both name the section: "One
- * pinned sequence on the whole site, in section 01, at 1024 px and wider,
- * never on touch devices." Section 01 is `#pid-making`, the product rail.
- * Nothing else on this page may pin, and nothing else does.
+ * WHAT THIS USED TO BE, AND WHY IT IS NOT ANY MORE
  *
- * HOW IT WORKS
+ * A pinned sequence: the list was translated through a one-viewport frame so
+ * each step came to rest in the middle in turn, and the scroll snapped from
+ * one to the next. Two things were wrong with it. One flick of the wheel
+ * took the reader a whole step, which is the page reading its own scrollbar
+ * rather than the reader doing it. And the frame was exactly one viewport
+ * tall, so the fourth step's card was clipped by the bottom of it and its
+ * body copy was never visible at all.
  *
- * The list of four steps is about 2,150 px tall, so pinning it as-is would
- * fix an element twice the height of the window and put its lower half out of
- * reach. Instead the frame around the list is made exactly one viewport tall
- * and pinned, and the list is translated through it, so each step comes to
- * rest in the middle in turn while the section holds still.
+ * So there is no pin, no snap and no frame. The section scrolls like every
+ * other section on the page. All that is left is what the rail needs: one
+ * number for how far down the four the reader has got, and a lit ordinal for
+ * the one they are on.
  *
- * ORDER MATTERS HERE
+ * `--pida-rail` runs 0 to 1 across the section and the stylesheet grows the
+ * lit run to match, so the fill and the ordinals going red are the same
+ * measurement and cannot drift apart. data-pida-active and data-pida-passed
+ * are unchanged, so every rule already written against them still applies.
  *
- * The frame is sized *before* the ScrollTrigger is created. ScrollTrigger
- * measures its pinned element and builds a spacer at construction time, so
- * sizing it afterwards leaves the spacer wrong and the frame keeps its full
- * 2,150 px. The sizing is done by setting data-pida-pinned on the section and
- * letting the stylesheet own the rule, which also means the un-pinned layout
- * and every layout below 1024 px is untouched by the existence of the pin.
- *
- * The end distance is in pixels, not `+=300%`. A percentage there is relative
- * to the scroller, which reads as the same thing until the window is an
- * unusual shape and then quietly is not.
- *
- * WHERE THIS DEPARTS FROM C7.3
- *
- * C7.3 specifies `+=200%` for a three-beat sequence whose beats were M1, the
- * nine chips filling, and an M1-to-M2 crossfade. The section has since been
- * rebuilt as four steps, so the distance is one viewport per transition and
- * the snap has four points rather than three. Scrub, pin gating and
- * anticipatePin are unchanged.
- *
- * The lighting is done by toggling data attributes, not by tweening colour,
- * because C7.1 allows only transform, opacity, clip-path and stroke-dashoffset
- * to be animated. A colour change driven by a CSS transition on a state
- * attribute is an interface state change, which A6.10 allows at 120 to 200 ms.
- *
- * ACCESSIBILITY
- *
- * C15: "The pinned sequence must not trap keyboard users. All of its content
- * is in the DOM in reading order, and tabbing moves through it. While focus
- * is inside section 01, the pin is disabled and the section shows its stacked
- * layout." The focusin handler below does exactly that, permanently for the
- * rest of the session once a keyboard user has been inside the section.
+ * With the script absent, under reduced motion, or below the width this is
+ * built for, none of it exists: the rail is unlit, every ordinal is at rest,
+ * and the section is a plain list of four. That is C7.4's requirement and it
+ * is also just the markup.
  */
-import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const SECTION = "#pid-making";
 
+/** Returns a teardown that restores everything it touched. */
 export function initPinnedSteps(): () => void {
   const section = document.querySelector<HTMLElement>(SECTION);
-  const frame = section?.querySelector<HTMLElement>('[data-pida="step-frame"]');
-  const list = section?.querySelector<HTMLElement>('[data-pida="step-list"]');
-  if (!section || !frame || !list) return () => {};
+  const steps = section
+    ? Array.from(section.querySelectorAll<HTMLElement>('[data-pida="step"]'))
+    : [];
+  if (!section || steps.length < 2) return () => {};
 
-  const steps = Array.from(
-    list.querySelectorAll<HTMLElement>('[data-pida="step"]')
-  );
-  if (steps.length < 2) return () => {};
+  const rail = section.querySelector<HTMLElement>('[data-pida="rail-run"]');
 
-  const last = steps.length - 1;
-
-  /* Size the frame first. See "ORDER MATTERS HERE" above. */
-  section.dataset.pidaPinned = "true";
-
-  /**
-   * Where the list must sit for step i to come to rest in the frame.
+  /* WHERE EACH BOX SITS ON THE RAIL, AS A FRACTION OF IT.
    *
-   * Dead centre, but with a ceiling on how far down the frame a short step is
-   * pushed. The frame is a viewport tall from the moment this runs, and the
-   * pin does not engage until the frame's own top reaches the viewport top,
-   * so for the length of the header there is a stretch where the frame is on
-   * screen and unpinned. Centring a 388px step in a 900px frame put 256px of
-   * nothing between the heading and step 01 for that whole stretch, which
-   * read as a hole in the layout rather than as space.
-   */
-  const restFor = (i: number) => {
-    const step = steps[i];
-    const centred = Math.max(0, (frame.clientHeight - step.offsetHeight) / 2);
-    const slack = Math.min(centred, frame.clientHeight * 0.14);
-    return -(step.offsetTop - slack);
-  };
+   * A box lights when the run actually arrives at it, so the threshold has
+   * to be the box's own position, measured.
+   *
+   * It used to be Math.round(progress * 3), which is not a position at all:
+   * that lit box 02 at 17% of the way down, long before the run was
+   * anywhere near it, and box 03 at 50%, which is somewhere else again. The
+   * run and the lighting were two different numbers pretending to be one.
+   *
+   * Measured once per refresh rather than every frame, because the layout
+   * only moves when ScrollTrigger says it has. Box 01 sits above the top of
+   * the run, so its threshold comes out at or below zero and it is lit from
+   * the first frame. It is the only one that should be. */
+  let marks: number[] = steps.map(() => 0);
 
-  let current = -1;
-  const light = (i: number) => {
-    if (i === current) return;
-    current = i;
-    steps.forEach((step, n) => {
-      step.dataset.pidaActive = n === i ? "true" : "false";
-      step.dataset.pidaPassed = n <= i ? "true" : "false";
+  const measure = () => {
+    if (!rail) return;
+    const top = rail.getBoundingClientRect().top + window.scrollY;
+    const height = rail.offsetHeight || 1;
+    marks = steps.map((step) => {
+      const box = step.querySelector<HTMLElement>('[data-pida="step-box"]');
+      if (!box) return 0;
+      /* The head has to reach the box's TOP edge: that is the moment the
+         run meets the square and splits around it. */
+      const y = box.getBoundingClientRect().top + window.scrollY;
+      return (y - top) / height;
     });
   };
 
-  gsap.set(list, { y: restFor(0) });
-  light(0);
+  const light = (progress: number) => {
+    let reached = 0;
+    steps.forEach((step, i) => {
+      const passed = progress >= marks[i];
+      if (passed) reached = i;
+      step.dataset.pidaPassed = passed ? "true" : "false";
+    });
+    steps.forEach((step, i) => {
+      step.dataset.pidaActive = i === reached ? "true" : "false";
+    });
+  };
 
-  const tl = gsap.timeline({
-    defaults: { ease: "none" },
-    scrollTrigger: {
-      trigger: frame,
-      start: "top top",
-      end: () => `+=${last * window.innerHeight}`,
-      pin: frame,
-      pinSpacing: true,
-      anticipatePin: 1,
-      scrub: 0.6,
-      invalidateOnRefresh: true,
-      snap: { snapTo: steps.map((_, i) => i / last), duration: 0.3 },
-      onUpdate: (self) => light(Math.round(self.progress * last)),
-      onToggle: (self) =>
-        gsap.set(list, { willChange: self.isActive ? "transform" : "auto" }),
+  measure();
+  light(0);
+  /* Claim the variable straight away. The stylesheet lights the whole rail
+     when --pida-rail is absent, which is what a reader with no JavaScript
+     should see, and it used to be what everyone saw between the page
+     loading and the trigger going live: scroll in and the rail was full,
+     then emptied the moment it started tracking. Writing 0 here means the
+     script owns the rail from the first frame it exists. */
+  section.style.setProperty("--pida-rail", "0");
+
+  const trigger = ScrollTrigger.create({
+    /* THE RUN KEEPS STATION IN THE MIDDLE OF THE WINDOW.
+     *
+     * The trigger is the rail itself, not the section, and it runs from its
+     * top crossing the middle of the window to its bottom crossing the same
+     * line. That makes the progress the exact fraction of the rail above the
+     * window's centre, and since the head is drawn at that fraction of the
+     * rail, the head sits ON the centre line the whole way down. It cannot
+     * run ahead of the reader or trail behind them.
+     *
+     * The old range was the whole SECTION, from 65% to 55% of the window,
+     * which is 4,982 pixels of scroll for 4,370 pixels of rail: the head
+     * crept up the screen the whole way and the run finished early, with the
+     * last of it somewhere above the fold. Tying the two together is both
+     * the slower feel and one fewer number to guess at. */
+    trigger: rail ?? section,
+    start: "top center",
+    end: "bottom center",
+    invalidateOnRefresh: true,
+    onRefresh: () => {
+      measure();
+      light(parseFloat(section.style.getPropertyValue("--pida-rail")) || 0);
+    },
+    onUpdate: (self) => {
+      section.style.setProperty("--pida-rail", self.progress.toFixed(4));
+      light(self.progress);
     },
   });
 
-  for (let i = 1; i <= last; i += 1) {
-    tl.to(list, { y: () => restFor(i), duration: 1 }, i - 1);
-  }
-
-  const restore = () => {
-    tl.scrollTrigger?.kill(true);
-    tl.kill();
-    delete section.dataset.pidaPinned;
-    gsap.set(list, { clearProps: "transform,willChange" });
-  };
-
-  /* C15: the moment a keyboard user lands anywhere inside the section, the
-     pin goes away and the section returns to its stacked layout, with every
-     step lit so nothing is left dimmed behind them. */
-  const release = () => {
-    restore();
-    steps.forEach((step) => {
-      step.dataset.pidaActive = "true";
-      step.dataset.pidaPassed = "true";
-    });
-    section.removeEventListener("focusin", release);
-    ScrollTrigger.refresh();
-  };
-  section.addEventListener("focusin", release);
-
   return () => {
-    section.removeEventListener("focusin", release);
-    restore();
+    trigger.kill();
+    section.style.removeProperty("--pida-rail");
     steps.forEach((step) => {
       delete step.dataset.pidaActive;
       delete step.dataset.pidaPassed;

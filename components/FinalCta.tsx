@@ -20,14 +20,14 @@ export default function FinalCta() {
     <section id="trial" className={`${styles.final} band`}>
       <div className={`container ${styles.inner}`} data-pida-reveal="text">
         <h2 className={`display-xl wash ${styles.heading}`}>
-          Stop redrawing
+          Efficiency at your
           <br />
-          the <span className="accent-word">same</span> sheet.
+          <span className="accent-word">fingertips</span>.
         </h2>
 
         <p className={`sub-headline ${styles.sub}`}>
-          A P&amp;ID in 30 seconds. A hydraulic model in under a minute. Every
-          value traceable to its source.
+          A P&amp;ID in 30 seconds. A hydraulic model in under a minute. And
+          many more.
         </p>
 
         <a
@@ -35,12 +35,8 @@ export default function FinalCta() {
           href="/trial"
           data-pida="cta"
         >
-          Sign up for trial
+          Sign up for early access
         </a>
-
-        <p className={`mono-label ${styles.note}`}>
-          No password to create / Your documents stay yours
-        </p>
       </div>
     </section>
   );

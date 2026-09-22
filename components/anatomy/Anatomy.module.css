@@ -2,7 +2,7 @@
  *
  * TWO LAYOUTS, ONE MARKUP, as the hero does it. Everything outside the
  * [data-anatomy="on"] block is the static page: one screen, the heading and
- * the four labels in document order, no pinning and no tall runway. That is
+ * the three labels in document order, no pinning and no tall runway. That is
  * what renders with JavaScript off, under reduced motion, and on a machine
  * with no WebGL. Anatomy.tsx sets the attribute only once it has a scene.
  *
@@ -24,6 +24,32 @@
   flex-direction: column;
   gap: clamp(32px, 5vw, 56px);
   padding: clamp(40px, 6vh, 72px) var(--pida-margin) clamp(56px, 8vh, 96px);
+
+  /* THE FIELD BEHIND THE DRAWING
+   *
+   * The plates are matte and near-black now, and a matte object on a flat
+   * black ground has nothing to sit against: it reads as a shape cut out of
+   * the page rather than an object in front of it. So the pane gets a
+   * depth: a field of smoke low and to the right, where nothing else is,
+   * falling to black long before it reaches the heading or either column
+   * of labels.
+   *
+   * The file is graded to be ADDED to the ground, not to replace it. It
+   * runs to black everywhere the smoke is not, and `screen` against the
+   * pane's own token colour is exactly "add this much light": black in the
+   * file leaves --pida-bg-sunken untouched, and the brightest wisp lifts it
+   * about twenty points. So the section keeps the colour tokens.css gives
+   * it and the image can only ever lighten it.
+   *
+   * The grain is in the file rather than in an overlay on top of it, which
+   * is one request and one layer instead of two, and it is the reason the
+   * dark falloff has no banding in it. */
+  background-color: var(--pida-bg-sunken);
+  background-image: url("/media/smoke-field.webp");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+  background-blend-mode: screen;
 }
 
 /* With no scene there is nothing to look at, so the canvas takes no room.
@@ -79,17 +105,64 @@
 .labelTitle {
   font-family: var(--pida-font-display);
   font-weight: 400;
-  font-size: clamp(18px, 1.5vw, 22px);
+  font-size: clamp(22px, 1.8vw, 26px);
   line-height: 1.18;
   letter-spacing: -0.025em;
   color: var(--pida-fg);
   text-wrap: balance;
 }
 
-.labelBody {
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--pida-fg-muted);
+/* ------------------------------------------------------------- leaders
+ *
+ * The line from a label to the chip under the pointer. Anatomy.tsx writes
+ * the path and the arrow head; everything about how they look is here. It
+ * exists only on the scrubbed stage, because that is the only place there
+ * are chips to point at.
+ */
+
+.leader {
+  display: none;
+}
+
+.leaderLine {
+  fill: none;
+  /* The lighter of the two accent stops. The line is the brightest thing in
+     the figure by design: it is the one element tying the words to the
+     plate, and it is drawn over a render that is itself lit. */
+  stroke: var(--pida-action-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The terminator. An arrow head, because these leaders land on the edge of
+   a plate rather than on its face, which is what the drawing standards
+   distinguish. */
+.leaderHead {
+  fill: var(--pida-action-soft);
+}
+
+/* The leader is the one thing tying the words to the drawing, so it is drawn
+   to be seen: two shadows rather than one, a tight core that keeps the line
+   crisp and a wide, weak halo that lifts it off the render behind it. One
+   large blur on its own only makes the line look soft. */
+.leaderLine {
+  filter: drop-shadow(0 0 2px var(--pida-action))
+    drop-shadow(0 0 10px var(--pida-action-edge));
+}
+
+.leaderHead {
+  filter: drop-shadow(0 0 3px var(--pida-action))
+    drop-shadow(0 0 14px var(--pida-action-edge));
+}
+
+/* The label at the other end of the leader. */
+.labelTitle {
+  transition: color 160ms var(--pida-ease);
+}
+
+.label[data-lit] .labelTitle {
+  color: var(--pida-action);
 }
 
 /* --------------------------------------------------- the scrubbed stage */
@@ -117,6 +190,30 @@
   z-index: 0;
 }
 
+.runway[data-anatomy="on"] .leader {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms var(--pida-ease);
+}
+
+.runway[data-anatomy="on"] .leader[data-on="on"],
+.runway[data-anatomy="on"] .leader[data-on="held"] {
+  opacity: 1;
+}
+
+/* Latched reads heavier than hovered, so a reader can tell the two apart
+   once the pointer has moved away. */
+.runway[data-anatomy="on"] .leader[data-on="held"] .leaderLine {
+  stroke-width: 2.4;
+}
+
 .runway[data-anatomy="on"] .intro {
   position: absolute;
   z-index: 2;
@@ -130,7 +227,17 @@
   inset: 0;
   z-index: 2;
   display: block;
+  /* The reading width of the static list would leave the right-hand labels
+     in the middle of the pane, over the drawing. Pinned, this element is the
+     full-bleed layer the labels are positioned inside, not a column. */
+  max-width: none;
+  /* The layer takes no pointer events, but each label does: hovering the
+     words lights the plate they name, which is the other end of the leader. */
   pointer-events: none;
+}
+
+.runway[data-anatomy="on"] .label {
+  pointer-events: auto;
 }
 
 /* The labels sit in the margins the drawing leaves empty: two down the left
@@ -139,36 +246,40 @@
    than being pinned to pixels that only hold at one height. */
 .runway[data-anatomy="on"] .label {
   position: absolute;
-  width: min(30ch, 23vw);
+  /* Held to a share of the pane rather than to a measure: the drawing is
+     centred and takes the middle of the width, so a label wide enough to
+     reach it is a label the drawing cuts through. */
+  width: clamp(220px, 21vw, 330px);
   max-width: none;
 }
 
 .runway[data-anatomy="on"] .label[data-side="left"] {
-  left: var(--pida-margin);
+  /* In from the page margin, not on it: close enough to the edge that
+     anything cropping the window takes the first word with it is too far
+     out, and far enough in that the drawing reaches the words is too far
+     in. 4.5vw is the second of those, found by measuring where the widest
+     corner of the open stack actually lands. */
+  left: clamp(20px, 4.5vw, 150px);
   text-align: right;
   align-items: flex-end;
 }
 
 .runway[data-anatomy="on"] .label[data-side="right"] {
-  right: var(--pida-margin);
+  right: clamp(20px, 4.5vw, 150px);
   text-align: left;
   align-items: flex-start;
 }
 
 .runway[data-anatomy="on"] .label:nth-child(1) {
-  top: 26%;
+  top: 24%;
 }
 
 .runway[data-anatomy="on"] .label:nth-child(2) {
-  top: 40%;
+  top: 46%;
 }
 
 .runway[data-anatomy="on"] .label:nth-child(3) {
-  top: 58%;
-}
-
-.runway[data-anatomy="on"] .label:nth-child(4) {
-  top: 72%;
+  top: 68%;
 }
 
 /* Below 1024px there are no margins left to put words in: the drawing takes
@@ -181,10 +292,34 @@
 
   .runway[data-anatomy="on"] .margins {
     inset: auto 0 0 0;
-    padding: 0 var(--pida-margin) clamp(24px, 5vh, 48px);
+    /* Room at the top for the scrim to fade in over, not just room for the
+       words. Without it the gradient has nothing to run through and the
+       first line of type still lands on bare linework. */
+    padding: clamp(56px, 12vh, 120px) var(--pida-margin) clamp(24px, 5vh, 48px);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(16px, 3vw, 28px);
+    /* In this band the labels sit OVER the drawing rather than beside it,
+       and a P&ID is dense: every one of them was landing on linework. The
+       hero's own scrim tokens go under them, which is the same answer the
+       hero reached for the same problem, and they run to the sunken surface
+       at alpha 0 rather than to `transparent` so the middle of the ramp does
+       not grey out. */
+    background: linear-gradient(
+      to top,
+      var(--pida-scrim-solid) 0%,
+      var(--pida-scrim-mid) 52%,
+      var(--pida-scrim-none) 100%
+    );
+  }
+
+  /* No leader below the margins breakpoint. A leader joins words in the
+     margin to the plate beside them; here the words are a list at the foot
+     of the pane, so the line runs back across the whole drawing and often
+     straight off the edge of it. The plate still lifts and lights when its
+     label is touched, which is the part that carries meaning. */
+  .runway[data-anatomy="on"] .leader {
+    display: none;
   }
 
   .runway[data-anatomy="on"] .label,
@@ -195,18 +330,10 @@
     text-align: left;
     align-items: flex-start;
   }
-
-  .runway[data-anatomy="on"] .labelBody {
-    display: none;
-  }
 }
 
 @media (max-width: 599px) {
   .runway[data-anatomy="on"] .margins {
     grid-template-columns: 1fr;
-  }
-
-  .runway[data-anatomy="on"] .label:nth-child(n + 3) {
-    display: none;
   }
 }

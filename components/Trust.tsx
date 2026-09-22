@@ -33,7 +33,7 @@ const cards = [
     Icon: SealCheckIcon,
     label: "Independently checked",
     title: "An independent check on every drawing.",
-    body: "Every generated drawing arrives with an independent check report and a redline. When PIDA checks a drawing made elsewhere, the checker first proves itself on planted defects, then reports findings with positions.",
+    body: "Every generated drawing arrives with an independent check report and a redline, written from the same model the drawing came from.",
   },
   {
     Icon: QuotesIcon,

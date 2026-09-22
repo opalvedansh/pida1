@@ -73,13 +73,11 @@ export function initHeroStage(stage3d: boolean): () => void {
       stage.dataset.pidaHeroStage = "off";
     });
 
-    /* Frame zero: the sheet oversized and tilted behind the copy.
-       z and scale multiply through the perspective divide, so the reference's
-       own pair (translateZ 800px, scale 2.8, perspective 950) resolves to
-       about thirteen times life size. That is fine over a video, which reads
-       as light at any zoom; over a drawing it is a wall of cropped linework.
-       420 and 1.55 resolve to 2.8x, which is a dolly you can still read. */
-    gsap.set(sheet, { z: 420, scale: 1.55, rotationX: -7, opacity: 0 });
+    /* Frame zero: the artefact at rest, holding the whole pane. It is the
+       first thing on the page and it is meant to be looked at, so it starts
+       finished rather than arriving out of a zoom nobody has scrolled to
+       yet. The move is the exit, not the entrance. */
+    gsap.set(sheet, { z: 0, scale: 1, rotationX: 0, opacity: 1 });
 
     const tl = gsap.timeline({
       defaults: { ease: "none" },
@@ -97,20 +95,20 @@ export function initHeroStage(stage3d: boolean): () => void {
     });
 
     tl
-      /* The sheet settles into its rest size first. */
-      .to(sheet, { z: 0, scale: 1, rotationX: 0, duration: 0.62 }, 0)
-      /* Opacity resolves well before the transform does, the way the
-         reference fades its layer up: the biggest, most cropped part of the
-         move happens while there is still nothing to look at. */
-      .to(sheet, { opacity: 1, duration: 0.22 }, 0)
-      /* The copy leaves through the camera, starting once the sheet is
-         legible enough to take over. autoAlpha rather than opacity, so the
-         buttons leave the tab order instead of staying focusable under a
-         drawing nobody can see them on. */
-      .to(copy, { z: 420, autoAlpha: 0, duration: 0.42 }, 0.3)
-      /* A beat at the end, so the sheet is held at rest for the last third
-         of the runway rather than unpinning the instant it arrives. */
-      .to({}, { duration: 0.28 }, 0.72);
+      /* The copy leaves through the camera first. autoAlpha rather than
+         opacity, so the buttons leave the tab order instead of staying
+         focusable under something nobody can see them on. */
+      .to(copy, { z: 400, autoAlpha: 0, duration: 0.42 }, 0)
+      /* Then the lattice follows it through, and is gone by the time the
+         band below arrives. z and scale multiply through the perspective
+         divide, so 470 and 1.5 resolve to about three times life size. */
+      .to(sheet, { z: 470, scale: 1.5, rotationX: 5, duration: 0.74 }, 0.14)
+      /* Opacity goes late and fast: the fade should read as the lattice
+         passing the camera, not as it being turned down. */
+      .to(sheet, { opacity: 0, duration: 0.34 }, 0.52)
+      /* A beat at the end, so the pane is empty for a moment before it
+         unpins rather than handing over mid-move. */
+      .to({}, { duration: 0.12 }, 0.88);
 
     cleanups.push(() => {
       tl.scrollTrigger?.kill();

@@ -129,3 +129,17 @@
   font-size: 12px;
   line-height: 1.5;
 }
+
+/* The legal and product links are 16px of type in a 10px-gapped list, which
+   is a 16px target. On a phone the gap becomes padding instead, so each one
+   is tall enough to hit without the list growing. */
+@media (max-width: 767px) {
+  .list {
+    gap: 0;
+  }
+
+  .list a {
+    display: block;
+    padding-block: 11px;
+  }
+}

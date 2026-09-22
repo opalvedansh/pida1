@@ -30,8 +30,8 @@ import styles from "./Header.module.css";
 // where these resolve to /#anchor. The ids of the sections that existed
 // before the restructure are kept, so old links still land.
 const anchors = [
-  { href: "/#pid-making", label: "Product" },
-  { href: "/#use-cases", label: "Use cases" },
+  { href: "/#pid-making", label: "Tools" },
+  { href: "/#next-sheets", label: "Coming soon" },
 ];
 
 export default function Header() {
@@ -72,7 +72,7 @@ export default function Header() {
                 href="/trial"
                 data-pida="cta"
               >
-                Sign up for trial
+                Sign up for early access
               </a>
 
               <details className={styles.menu}>
@@ -100,9 +100,6 @@ export default function Header() {
                       <a href="/privacy">Privacy</a>
                     </li>
                     <li>
-                      <a href="/terms">Trial terms</a>
-                    </li>
-                    <li>
                       <a href="/legal">Legal and accessibility</a>
                     </li>
                   </ul>
@@ -118,7 +115,7 @@ export default function Header() {
           <a className={styles.strip} href="/trial" data-pida="cta">
             <span className={styles.stripGradient} aria-hidden="true" />
             <span className={styles.stripTexture} aria-hidden="true" />
-            <span className={styles.stripLabel}>Sign up for trial</span>
+            <span className={styles.stripLabel}>Sign up for early access</span>
             {/* An icon component, not a &rarr; glued to the label. It was
                 the one raw arrow character left in the page's copy, and it
                 sat at whatever weight the mono face happened to draw it,

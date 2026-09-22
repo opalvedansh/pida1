@@ -1,37 +1,49 @@
 /* The drafting crosshair. See the head of Cursor.tsx for why it exists and
    what keeps it from being hostile.
 
+   TWO ELEMENTS, NOT ONE. The crosshair is on the pointer and the
+   registration frame is on whatever is about to be clicked. They were one
+   element once, which meant that over a link the whole cursor moved to the
+   link's middle and turned into an outline: the reader got a box around a
+   button and no cursor at all. One element cannot be in two places, so
+   there are two.
+
    Everything here is transform and opacity, per C7.1, plus width and height
    on the frame, which is a state change rather than scroll-linked motion. */
 
 .cursor {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   z-index: 9999;
-  width: 0;
-  height: 0;
   pointer-events: none;
   color: var(--pida-action);
-  /* The element is positioned by transform in the rAF loop; this only
-     smooths the open and close of the registration frame. */
+}
+
+/* -------------------------------------------------------- the crosshair */
+
+.mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 1;
   transition: opacity 180ms var(--pida-ease);
   will-change: transform;
 }
 
-/* The four arms and the node are drawn from one element, so the whole
-   crosshair is a single composited layer. */
-.cursor::before,
-.cursor::after {
+/* The four arms are drawn from one element, so the whole crosshair is a
+   single composited layer. */
+.mark::before,
+.mark::after {
   content: "";
   position: absolute;
   background: currentColor;
-  transition: width 160ms var(--pida-ease), height 160ms var(--pida-ease),
-    opacity 160ms var(--pida-ease);
+  transition: width 160ms var(--pida-ease), height 160ms var(--pida-ease);
 }
 
 /* The horizontal arm. */
-.cursor::before {
+.mark::before {
   left: 50%;
   top: 50%;
   width: 21px;
@@ -40,7 +52,7 @@
 }
 
 /* The vertical arm. */
-.cursor::after {
+.mark::after {
   left: 50%;
   top: 50%;
   width: 1px;
@@ -48,36 +60,51 @@
   transform: translate(-50%, -50%);
 }
 
-/* Over something clickable the arms retract and a frame opens around the
-   target, so the crosshair says what is about to be clicked instead of just
-   where the pointer is. --w and --h are written by the rAF loop. */
-.cursor[data-state="framed"]::before {
-  width: var(--w, 21px);
-  height: var(--h, 21px);
-  background: none;
-  border: 1px solid currentColor;
-  border-radius: var(--pida-r-sm);
-  opacity: 0.85;
+/* Over something clickable the arms draw in a little, so the crosshair
+   answers the frame opening around the target without ever leaving the
+   pointer or going away. */
+.cursor[data-state="framed"] .mark::before {
+  width: 13px;
 }
 
-.cursor[data-state="framed"]::after {
-  opacity: 0;
+.cursor[data-state="framed"] .mark::after {
+  height: 13px;
 }
 
 /* Over running text and form fields the system cursor carries information a
    crosshair would take away, so this one steps back and the native one
-   comes through. */
-.cursor[data-state="quiet"] {
+   comes through. Cursor.tsx takes the body attribute off at the same time;
+   without that the reader would be left with no cursor at all. */
+.cursor[data-state="quiet"] .mark,
+.cursor[data-state="away"] .mark {
   opacity: 0;
 }
 
-.cursor[data-state="away"] {
+/* ------------------------------------------------- the registration frame */
+
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w, 0px);
+  height: var(--h, 0px);
+  border: 1px solid currentColor;
+  border-radius: var(--pida-r-sm);
   opacity: 0;
+  transition: opacity 160ms var(--pida-ease), width 160ms var(--pida-ease),
+    height 160ms var(--pida-ease);
+  will-change: transform;
 }
+
+.cursor[data-state="framed"] .frame {
+  opacity: 0.85;
+}
+
+/* ------------------------------------------------------- the native cursor */
 
 /* The native cursor is hidden only while this is actually mounted and live.
    The attribute comes off on teardown, which is also what the first Tab
-   press triggers. */
+   press triggers, and while the pointer is over running text. */
 :global(body[data-pida-cursor="on"]),
 :global(body[data-pida-cursor="on"] a),
 :global(body[data-pida-cursor="on"] button),

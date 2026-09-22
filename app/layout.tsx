@@ -6,6 +6,7 @@
  */
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Preloader from "@/components/Preloader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Motion from "@/components/motion/Motion";
@@ -56,6 +57,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        {/* First in the body, so it is painted with the first frame rather
+            than after the header has already appeared under it. It takes
+            itself off screen on a timer of its own; see Preloader.tsx. */}
+        <Preloader />
         <Header />
         <main>{children}</main>
         <Footer />

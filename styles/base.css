@@ -609,3 +609,11 @@ hr.rule {
     font-size: 9pt;
   }
 }
+
+/* Every button is a finger-sized target on a phone. The type does not need
+   to grow with it, so this is a floor on the box and nothing else. */
+@media (max-width: 767px) {
+  .btn {
+    min-height: 44px;
+  }
+}

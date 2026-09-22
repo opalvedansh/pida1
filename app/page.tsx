@@ -4,10 +4,9 @@
  * The block order follows the reference landing page kept in /hoplite:
  *
  *   hero            badge, one heading, one line, one button
- *   steps           the generator, as four numbered steps
- *   use cases       the other five capabilities, as a five-cell bento
- *   check band      the claim that the checker is not limited to our output
- *   next sheets     the three that are not drawn yet, over a solid ground
+ *   steps           the four tools that are built, numbered
+ *   use cases       hydraulics: the model built, and the same model solved
+ *   coming soon     the three that are not drawn yet, as an exploded stack
  *   faq             native disclosure list
  *   final cta       one heading, one button
  *
@@ -39,7 +38,6 @@
 import Hero from "@/components/Hero";
 import Steps from "@/components/Steps";
 import UseCases from "@/components/UseCases";
-import CheckBand from "@/components/CheckBand";
 import Anatomy from "@/components/anatomy/Anatomy";
 import Faq from "@/components/Faq";
 import FinalCta from "@/components/FinalCta";
@@ -50,11 +48,12 @@ export default function Home() {
       <Hero />
       <Steps />
       <UseCases />
-      <CheckBand />
       {/* The sheets board that used to sit here is replaced by the exploded
-          sheet. components/NextSheets.tsx is left in the tree unused, so the
-          old board is one import away if this is not the right call. The id
-          is kept, because that anchor may be linked from outside the site. */}
+          sheet, which now names the same three unbuilt pieces the board did.
+          components/NextSheets.tsx and components/sheets/plan.ts are left in
+          the tree unused, so the old board is one import away if this is not
+          the right call. The id is kept, because that anchor may be linked
+          from outside the site. */}
       <Anatomy id="next-sheets" headingLevel="h2" />
       <Faq />
       <FinalCta />

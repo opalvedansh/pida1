@@ -36,7 +36,6 @@ const trial = [
 
 const team = [
   "Shared projects across a review team",
-  "Checking of drawings made elsewhere, with planted-defect proof runs",
   "Hashed revision chain on every generated sheet",
 ];
 

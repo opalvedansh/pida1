@@ -31,19 +31,10 @@ export default function Faq() {
             page carries three of these labels in total rather than one above
             every section. The heading does the work on its own. */}
         <header className={styles.head}>
-          <h2 className="display-l wash" data-pida-reveal="text">
-            Questions,
-            <br />
-            <span className="accent-word">answered</span>.
+          <h2 className="display-m wash" data-pida-reveal="text">
+            Please leave your questions here. Our team will reach out to you
+            as soon as <span className="accent-word">possible</span>.
           </h2>
-
-          <p
-            className={`sub-headline ${styles.headSub}`}
-            data-pida-reveal="text"
-          >
-            Ask the ones that come up before anyone agrees to look at a
-            drawing.
-          </p>
         </header>
 
         {/* The whole right column now. The one Client Component in this

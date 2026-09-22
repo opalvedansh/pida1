@@ -43,7 +43,12 @@
     var(--pida-margin) clamp(56px, 8vh, 96px);
 }
 
+/* The copy has to be a positioned element in the static layout too, or the
+   pipe field behind it, which is positioned, paints over it. The pinned
+   layout's own z-index rules are more specific and still win there. */
 .copyLayer {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
 }
@@ -63,7 +68,23 @@
   display: none;
 }
 
+/* The hero is taller than its copy now that the sheet layer has gone, so
+   the pane is given a floor to stand the pipe field up in. Without it the
+   field is the height of four lines of type. */
+.viewport {
+  min-height: min(82svh, 760px);
+}
+
+/* THE PIPE LAYER FILLS THE PANE EITHER WAY.
+   The pinned 3D stage only runs on a landscape pane of a certain size, and
+   when it does not, this used to be an in-flow block with nothing in it:
+   one pixel tall, with the pipe field inside it having nowhere to draw. It
+   is a background, so it is positioned like one and sits under the copy,
+   which carries its own z-index. */
 .sheetLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   display: flex;
   justify-content: center;
   min-width: 0;
@@ -203,19 +224,10 @@
    --pida-z-header still sits over all of it. */
 .stage[data-pida-hero-stage="on"] .sheetLayer {
   z-index: 1;
-  align-items: center;
-  /* The bar floats over this pane, so the sheet is inset far enough to sit
-     clear of it rather than sliding under it at rest. */
-  padding: calc(var(--pida-header-h) + 16px) var(--pida-margin)
-    clamp(24px, 4vh, 48px);
-}
-
-/* At rest the sheet is the only thing on the pane, so it is sized off the
-   short axis to fill it: the 220px is the pane's own inset plus the frame's
-   strip and bezel, and 0.75 is the 4:3 the drawing is laid out at. Capped at
-   62rem so it does not turn into a billboard on a wide monitor. */
-.stage[data-pida-hero-stage="on"] .bezel {
-  width: min(68vw, calc((100svh - 220px) / 0.75), 62rem);
+  align-items: stretch;
+  /* No inset. What is in this layer is no longer a framed drawing that has
+     to sit clear of the floating bar, it is a field that covers the pane. */
+  padding: 0;
 }
 
 .stage[data-pida-hero-stage="on"] .scrim {

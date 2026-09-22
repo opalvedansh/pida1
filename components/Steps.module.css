@@ -12,6 +12,19 @@
  * The three widths below are the whole layout. Change --index and the
  * ordinals and the panels move together. */
 
+/* A figure column wider than the reading column. Every stage in this section
+   holds a recording of an interface at 1920 or 1454 across, and the small
+   type in one of those is unreadable once it is scaled past about half. The
+   reading measure is unchanged: only the rail gets the extra width. */
+.steps :global(.container) {
+  max-width: min(96vw, 112rem);
+}
+
+.steps .head {
+  max-width: 90rem;
+  margin-inline: auto;
+}
+
 .steps {
   border-bottom: 1px solid var(--pida-edge);
 }
@@ -44,7 +57,11 @@
 
   position: relative;
   width: 100%;
-  max-width: 62rem;
+  /* The reading measure belongs to the copy, not to the figures. Every stage
+     in this rail holds a recording 1,920 or 1,454 pixels across, and at
+     62rem they were rendering at 854, which is where the small type in them
+     was going. The card under each stage keeps its own measure. */
+  max-width: min(100%, 118rem);
   /* Left-aligned, not centred: the ordinals then run down the same datum as
      the eyebrow and the heading above them, which is the whole point of
      moving them into the margin. */
@@ -52,35 +69,7 @@
   margin-top: clamp(2rem, 4vw, 3.5rem);
 }
 
-/* The trace bundles. Decoration, so they are hidden from assistive
-   technology, sit behind everything, and only appear where there is real
-   margin to put them in. */
-.traces {
-  position: absolute;
-  top: 0;
-  z-index: -1;
-  height: 100%;
-  color: var(--pida-edge);
-  pointer-events: none;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70px);
-  mask-image: linear-gradient(to bottom, transparent, #000 70px);
-  display: none;
-}
 
-@media (min-width: 1280px) {
-  .traces {
-    display: block;
-  }
-}
-
-.left {
-  right: calc(100% + 2rem);
-}
-
-.right {
-  left: calc(100% + 2rem);
-  transform: scaleX(-1);
-}
 
 .list {
   display: flex;
@@ -105,10 +94,8 @@
   position: relative;
 }
 
-[data-pida-pinned="true"] .frame {
-  height: 100vh;
-  overflow: hidden;
-}
+/* The pinned frame is gone: the section scrolls normally now, and the
+   rule that cut it to one viewport was what clipped the fourth step. */
 
 /* ---------------------------------------------------------------- step */
 
@@ -126,6 +113,75 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+/* ---------------------------------------------------------------- box
+ *
+ * A square station on the datum.
+ *
+ * The rail used to run straight past the ordinals, which made them labels
+ * standing next to a line rather than anything the line arrived at. Boxed,
+ * the trace reads the way a drawing draws a line meeting a component: it
+ * comes down the centre, splits at the top edge, carries round both sides,
+ * converges at the bottom edge and goes on to the next one.
+ *
+ * HOW THE SPLIT IS DRAWN, WHICH IS TO SAY IT IS NOT
+ *
+ * There is no second path and no SVG. The box is opaque and sits one layer
+ * above the rail, so the lit run passes BEHIND it and is simply hidden: the
+ * line stops dead at the top edge, the box's own border carries the eye
+ * round both sides, and the run reappears at the bottom edge. Four boxes
+ * with a background beat four hand-built paths that would have to be
+ * re-measured on every resize and would still be wrong at the clamp ends.
+ *
+ * The box is exactly the index column wide, so however the clamp resolves
+ * it can never spill into the leader gap.
+ */
+.box {
+  position: relative;
+  /* Above .rail_ (1) and .indexRule (0). None of the three ancestors sets a
+     z-index, so these compare in the one stacking context. */
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: var(--index);
+  height: var(--index);
+  background: var(--bg);
+  /* The same weight as the run itself, less one pixel for the corner. A
+     hairline could not carry a 3px line round two corners and read as the
+     same line; at 2px the eye joins them. Grey or accent, never a different
+     width, so nothing in the column moves when a box lights. */
+  border: 2px solid var(--pida-edge);
+  border-radius: 2px;
+  transition: border-color 220ms var(--pida-ease),
+    box-shadow 220ms var(--pida-ease), background-color 220ms var(--pida-ease);
+}
+
+/* Reached. The border is the half of the trace that goes round the outside,
+   so it takes the accent the run is carrying, and the inside takes a wash
+   of it: the station is energised, not merely outlined.
+
+   Two selectors because there are two ways a box is lit. data-active is the
+   no-JavaScript state, fixed on box 01. data-pida-passed is what the
+   sequence writes once it is running, and it is true for every box the run
+   has already reached. */
+.box[data-active],
+.step[data-pida-passed="true"] .box {
+  border-color: var(--pida-action);
+  background: color-mix(in oklab, var(--pida-action) 7%, var(--bg));
+  box-shadow: 0 0 8px -1px var(--pida-action),
+    0 0 22px -2px var(--pida-action-edge);
+}
+
+/* Not reached yet. Explicit, because data-active stays on box 01 for the
+   no-script case and would otherwise keep it lit on the way back up. */
+.step[data-pida-passed="false"] .box {
+  border-color: var(--pida-edge);
+  background: var(--bg);
+  box-shadow: none;
 }
 
 /* Big, quiet, and structural. It is the thing a reader scans the margin
@@ -150,14 +206,141 @@
   color: var(--pida-action);
 }
 
-/* Runs from under the ordinal, through the list gap, to the next one. */
+/* Runs from the bottom edge of one box, through the list gap, to the top
+   edge of the next. The unlit datum, per step; the lit run is one element
+   for the whole rail, see .rail_ below.
+
+   Both are now centred on the box rather than sitting on the index column's
+   left edge, so the line meets each square head on. */
 .indexRule {
   position: absolute;
-  left: 0;
-  top: calc(var(--ordinal) * 0.85 + 40px);
+  z-index: 0;
+  left: calc(var(--index) / 2 - 1.5px);
+  top: var(--index);
   bottom: calc(-1 * var(--step-gap));
-  width: 1px;
+  width: 3px;
+  border-radius: 2px;
   background: var(--pida-edge);
+}
+
+/* The last one has no gap to bridge, so it stops at the foot of its own
+   step, which is where the run ends too. */
+.step:last-child .indexRule {
+  bottom: 0;
+}
+
+/* ----------------------------------------------------------- the rail
+ *
+ * One line down the index column, filled to wherever the reader has got to:
+ * a progress bar without a number on it. While the pinned sequence runs it
+ * reads --pida-rail, which components/motion/pinnedSteps.ts writes from the
+ * sequence's own progress, so the fill and the ordinals going red are the
+ * same measurement and cannot drift apart. With no script it falls back to
+ * its own passage through the viewport, which is close enough and costs
+ * nothing.
+ */
+
+.rail_ {
+  position: absolute;
+  z-index: 1;
+  /* Centred on the boxes, and starting at the bottom edge of the first one:
+     box 01 is where the run comes from rather than somewhere it arrives, so
+     it is lit by its own state and the run begins underneath it. */
+  left: calc(var(--index) / 2 - 4.5px);
+  top: var(--index);
+  bottom: 0;
+  width: 9px;
+  pointer-events: none;
+}
+
+/* THE PROGRESS BAR.
+   Height, not a scaled transform. Scaling the fill meant the tip on the end
+   of it was scaled too, so it had to be counter-scaled back, and the two
+   never quite agreed: the tip stretched into an ellipse at one end of the
+   run and sat off the line at the other. Growing the height puts the tip
+   exactly on the end of the fill at every value, which is the whole job. */
+.railFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 9px;
+  height: calc(var(--pida-rail, 0) * 100%);
+}
+
+/* The lit run itself. Brightest at its head and cooling off behind, so it
+   reads as something travelling rather than a bar being filled. */
+.railFill::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--pida-action) 45%, transparent) 0%,
+    var(--pida-action) 62%,
+    var(--pida-action) 100%
+  );
+  box-shadow: 0 0 7px 0 var(--pida-action),
+    0 0 20px 3px var(--pida-action-edge);
+}
+
+/* THE SPARK on the head of the run. One element doing three things: a hot
+   white core, an accent halo around it, and a slow flare that keeps it
+   alive while the reader is not scrolling. */
+.railFill::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  margin-bottom: -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff 0%,
+    var(--pida-action) 42%,
+    transparent 72%
+  );
+  box-shadow: 0 0 10px 2px var(--pida-action),
+    0 0 26px 6px var(--pida-action-edge);
+  animation: railSpark 1.6s ease-in-out infinite;
+}
+
+/* The spark has nothing to sit on until the run has started. */
+.steps:not([style*="--pida-rail"]) .railFill::after {
+  opacity: 0;
+}
+
+@keyframes railSpark {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.45);
+    opacity: 1;
+  }
+}
+
+/* No script, no --pida-rail: the rail is lit whole and still, which is also
+   what a reader who asked for less motion gets. Keyed on the variable, not
+   on an attribute: this used to test data-pida-pinned, which stopped
+   existing when the pin was removed, so the rule matched always and pinned
+   the bar at full height whatever the reader did. */
+.steps:not([style*="--pida-rail"]) .railFill {
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .railFill::after {
+    animation: none;
+  }
 }
 
 /* ------------------------------------------------------------- content */
@@ -175,6 +358,43 @@
 
 .connector {
   display: none;
+}
+
+/* ------------------------------------------------------- phones
+ *
+ * The index column costs 64px of a 375px screen once its gap is counted,
+ * and the panel and stage take another 32px in padding. That left the
+ * recording 232px wide: a 1,920px capture of an interface at less than a
+ * seventh of its size, which is a grey smear. On a phone the ordinal and
+ * its meter go above the panel in a row, the rail and its leader go, and
+ * the recording gets the width instead.
+ */
+@media (max-width: 767px) {
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 14px;
+  }
+
+  .index {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Both run down a column that no longer exists. */
+  .indexRule,
+  .rail_ {
+    display: none;
+  }
+
+  .panel {
+    padding: 4px;
+  }
+
+  .stage {
+    padding: 6px;
+    min-height: 0;
+  }
 }
 
 @media (min-width: 768px) {
@@ -281,10 +501,16 @@
 .stage {
   position: relative;
   display: flex;
+  /* A step may hold two frames. The workspace is one tool with two views,
+     flow path and isolation, so they stack inside its own stage rather than
+     being split into two steps that would read as two tools. */
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 1.4vw, 20px);
   flex: 1;
   min-height: clamp(170px, 14vw, 210px);
   width: 100%;
-  padding: clamp(16px, 1.8vw, 26px);
+  padding: clamp(10px, 1vw, 16px);
   border-radius: var(--pida-r-lg);
   background: var(--pida-bg);
   /* On a dark page a raised surface reads from its top highlight, not from a
@@ -378,6 +604,14 @@
   background: var(--pida-bg-raised);
 }
 
+/* These are light screenshots of an interface. On the stage's dark ground
+   they need an edge of their own, or they float as a bright rectangle with
+   nothing holding it. */
+.stage > figure :global(.frame) > div:last-child {
+  border: 1px solid var(--pida-edge);
+  border-radius: var(--pida-r-md);
+}
+
 /* ---------------------------------------------------------------- card */
 
 .card {
@@ -432,18 +666,30 @@
   text-wrap: pretty;
 }
 
+/* One line of real figures under the body, where a tool has any. Set in
+   the mono face, like every other figure on the page. */
+.cardNote {
+  margin-top: 8px;
+  color: var(--pida-fg-faint);
+}
+
 /* --------------------------------------------------------------- meter */
 
+/* Inside the box now, so the box's own gap spaces it and the old margin
+   would only push the pair off centre. */
 .meter {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: clamp(2px, calc(var(--index) / 18), 4px);
   flex: none;
-  margin-top: 14px;
 }
 
+/* Sized off the box rather than fixed. Four 10px bars and three 4px gaps
+   come to 52px, which is wider than the box everywhere under about 1130px:
+   the meter was hanging out of the bottom-left corner of every square on a
+   phone. Tied to --index it is always narrower than the square it is in. */
 .meter span {
-  width: 10px;
+  width: clamp(6px, calc(var(--index) / 7), 10px);
   height: 2px;
   border-radius: 1px;
   background: rgba(229, 229, 229, 0.14);
@@ -452,135 +698,6 @@
 .meter span[data-lit] {
   background: var(--pida-action);
 }
-
-/* ------------------------------------------------- 01, the wizard steps */
-
-/* There are exactly nine wizard steps, so they are set as nine: three
-   columns of three, each column as wide as its own widest label. Wrapped
-   ragged they read as an unspecified pile of tags. */
-.chips {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-content: center;
-  gap: 9px 10px;
-  width: 100%;
-}
-
-@media (min-width: 620px) {
-  .chips {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.wizardChip {
-  display: flex;
-  align-items: center;
-  padding: 8px 14px;
-  border: 1px solid var(--pida-edge-strong);
-  border-radius: var(--pida-r-full);
-  background: var(--pida-bg-raised);
-  font-family: var(--pida-font-mono);
-  font-size: 12.5px;
-  line-height: 1.3;
-  letter-spacing: 0.008em;
-  color: var(--pida-fg-muted);
-  white-space: nowrap;
-}
-
-/* The step the drawing comes out of is the only one carrying the accent. */
-.wizardChip:last-child {
-  border-color: var(--pida-action-edge);
-  background: var(--pida-action-wash);
-  color: var(--pida-fg);
-}
-
-/* ---------------------------------------------------- 03, the verdict */
-
-.verdict {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-}
-
-.verdictLabel {
-  display: block;
-  /* .mono-label is 11px site-wide. In a panel this size it needs one more
-     step to read as a title block label rather than fine print. */
-  font-size: 12px;
-  letter-spacing: 0.11em;
-}
-
-.verdictFigure {
-  margin-top: 12px;
-  font-family: var(--pida-font-display);
-  font-weight: 400;
-  font-size: clamp(44px, 4.6vw, 66px);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  color: var(--pida-ok);
-}
-
-.verdictDetail {
-  margin-top: 8px;
-  font-family: var(--pida-font-mono);
-  font-size: 14px;
-  line-height: 1.45;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums;
-  color: var(--pida-fg-muted);
-}
-
-.verdictNote {
-  margin-top: 22px;
-  padding-top: 14px;
-  border-top: 1px solid var(--pida-edge);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--pida-fg-faint);
-}
-
-/* ---------------------------------------------- 04, the package written */
-
-.deliverables {
-  display: grid;
-  align-content: center;
-  gap: 9px 28px;
-  width: 100%;
-}
-
-/* Ten items stacked down one edge of a panel this wide leaves the other two
-   thirds empty and makes the list look longer than it is. Two columns read
-   as a delivered set. */
-@media (min-width: 620px) {
-  .deliverables {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-flow: column;
-    grid-template-rows: repeat(5, auto);
-  }
-}
-
-.deliverables li {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-family: var(--pida-font-mono);
-  font-size: 13px;
-  line-height: 1.5;
-  letter-spacing: 0.008em;
-  color: var(--pida-fg-muted);
-}
-
-.deliverables li::before {
-  content: "";
-  flex: none;
-  width: 5px;
-  height: 5px;
-  border-radius: 1px;
-  background: var(--pida-action);
-  transform: translateY(-2px);
-}
-
 
 /* ------------------------------------------------- the pinned sequence
  *
@@ -621,13 +738,14 @@
   transition: background-color 200ms var(--pida-ease);
 }
 
-/* The step being read is at full strength; the others stand back. Not so far
-   back that they stop being legible, because they are still on the screen. */
-.step[data-pida-active="false"] .panel {
-  opacity: 0.4;
-}
-
-.step[data-pida-active="true"] .panel {
+/* NO DIMMING. This used to drop every step but the active one to 0.4, which
+   was right when the sequence was pinned and only one step was ever on
+   screen. Scrolling normally, all four are on screen at once, so a step went
+   quiet while the reader was still reading it: step 01 faded to almost
+   nothing while its own description was in the middle of the window. The
+   rail and the ordinal carry which step you are on; the panels stay
+   readable. */
+.step .panel {
   opacity: 1;
 }
 

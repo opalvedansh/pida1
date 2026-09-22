@@ -1,0 +1,29 @@
+/* A real file in the frame of base.css. The frame draws the border, the
+   radius and the top strip; everything here is about the file inside it. */
+
+.figure {
+  min-width: 0;
+}
+
+/* The box is reserved at the file's own measured ratio, so nothing on the
+   page moves while the file loads. The ground under it is the raised fill
+   rather than nothing, because these are light screenshots on a dark page
+   and a transparent well flashes black before the first frame decodes. */
+.well {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--pida-bg-raised);
+}
+
+.media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Every one of these is a screenshot of an interface: a crop that cut a
+     panel in half would be worse than a hairline of letterbox, so they are
+     contained rather than cropped where the frame is not the file's ratio.
+     The frame is set to the file's ratio, so in practice neither happens. */
+  object-fit: contain;
+}
