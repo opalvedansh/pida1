@@ -1,0 +1,106 @@
+/* The drafting crosshair. See the head of Cursor.tsx for why it exists and
+   what keeps it from being hostile.
+
+   Everything here is transform and opacity, per C7.1, plus width and height
+   on the frame, which is a state change rather than scroll-linked motion. */
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  color: var(--pida-action);
+  /* The element is positioned by transform in the rAF loop; this only
+     smooths the open and close of the registration frame. */
+  transition: opacity 180ms var(--pida-ease);
+  will-change: transform;
+}
+
+/* The four arms and the node are drawn from one element, so the whole
+   crosshair is a single composited layer. */
+.cursor::before,
+.cursor::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  transition: width 160ms var(--pida-ease), height 160ms var(--pida-ease),
+    opacity 160ms var(--pida-ease);
+}
+
+/* The horizontal arm. */
+.cursor::before {
+  left: 50%;
+  top: 50%;
+  width: 21px;
+  height: 1px;
+  transform: translate(-50%, -50%);
+}
+
+/* The vertical arm. */
+.cursor::after {
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 21px;
+  transform: translate(-50%, -50%);
+}
+
+/* Over something clickable the arms retract and a frame opens around the
+   target, so the crosshair says what is about to be clicked instead of just
+   where the pointer is. --w and --h are written by the rAF loop. */
+.cursor[data-state="framed"]::before {
+  width: var(--w, 21px);
+  height: var(--h, 21px);
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: var(--pida-r-sm);
+  opacity: 0.85;
+}
+
+.cursor[data-state="framed"]::after {
+  opacity: 0;
+}
+
+/* Over running text and form fields the system cursor carries information a
+   crosshair would take away, so this one steps back and the native one
+   comes through. */
+.cursor[data-state="quiet"] {
+  opacity: 0;
+}
+
+.cursor[data-state="away"] {
+  opacity: 0;
+}
+
+/* The native cursor is hidden only while this is actually mounted and live.
+   The attribute comes off on teardown, which is also what the first Tab
+   press triggers. */
+:global(body[data-pida-cursor="on"]),
+:global(body[data-pida-cursor="on"] a),
+:global(body[data-pida-cursor="on"] button),
+:global(body[data-pida-cursor="on"] summary) {
+  cursor: none;
+}
+
+/* Never take the text cursor away from text or from a field. */
+:global(body[data-pida-cursor="on"] input),
+:global(body[data-pida-cursor="on"] textarea),
+:global(body[data-pida-cursor="on"] select) {
+  cursor: auto;
+}
+
+/* A pointer that cannot hover has nothing to show, and a reader who asked
+   for less motion asked for less of this too. Both are also checked in the
+   component before it mounts; this is the belt to that pair of braces. */
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor {
+    display: none;
+  }
+
+  :global(body[data-pida-cursor="on"]) {
+    cursor: auto;
+  }
+}

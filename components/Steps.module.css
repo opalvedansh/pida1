@@ -1,0 +1,652 @@
+/* The product rail.
+ *
+ * Two columns, not the reference's three. See the head of Steps.tsx for why
+ * the zig-zag went.
+ *
+ *   index      an ordinal set large in the display face, and a hairline
+ *              running the length of the list with a node per step
+ *   panel      one column, every panel on the same left edge, about twice
+ *              the old width so the figures have room
+ *   leader     a level hairline from the node to the panel's near corner
+ *
+ * The three widths below are the whole layout. Change --index and the
+ * ordinals and the panels move together. */
+
+.steps {
+  border-bottom: 1px solid var(--pida-edge);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-5);
+}
+
+.headSub {
+  max-width: 46ch;
+}
+
+/* The halftone square that used to sit in this eyebrow is gone. Every other
+   eyebrow on the page carries a Phosphor glyph at 14px in the accent, and a
+   bespoke mark in one section only was the odd one out. */
+
+/* ---------------------------------------------------------------- rail */
+
+.rail {
+  /* The type scale of the rail, in one place. 52 / 42 / 24 / 15.5 / 12.5 at
+     full width: each step is a decisive ratio, never a near-tie. The heading
+     above (.display-l, 52px) has to stay clearly larger than the ordinal, or
+     the index starts competing with the section title. */
+  --ordinal: clamp(26px, 3vw, 42px);
+  --index: clamp(44px, 4.6vw, 66px);
+  --leader: clamp(20px, 3.4vw, 60px);
+  --step-gap: clamp(2.5rem, 5vw, 4.5rem);
+
+  position: relative;
+  width: 100%;
+  max-width: 62rem;
+  /* Left-aligned, not centred: the ordinals then run down the same datum as
+     the eyebrow and the heading above them, which is the whole point of
+     moving them into the margin. */
+  margin-inline: 0;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+/* The trace bundles. Decoration, so they are hidden from assistive
+   technology, sit behind everything, and only appear where there is real
+   margin to put them in. */
+.traces {
+  position: absolute;
+  top: 0;
+  z-index: -1;
+  height: 100%;
+  color: var(--pida-edge);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70px);
+  mask-image: linear-gradient(to bottom, transparent, #000 70px);
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .traces {
+    display: block;
+  }
+}
+
+.left {
+  right: calc(100% + 2rem);
+}
+
+.right {
+  left: calc(100% + 2rem);
+  transform: scaleX(-1);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--step-gap);
+  list-style: none;
+}
+
+/* The window the pinned sequence scrolls the list through.
+ *
+ * It has no height of its own by default, so the section is an ordinary
+ * stack: that is what renders below 1024px, on touch, under reduced motion
+ * and with JavaScript off. The motion layer sets data-pida-pinned on the
+ * section only when it is actually about to pin, and only then does the
+ * frame become a one-viewport window with the list scrolling inside it.
+ *
+ * This has to be a stylesheet rule rather than a gsap.set, because
+ * ScrollTrigger measures the pinned element and builds its spacer when the
+ * trigger is constructed. Sizing the frame after that leaves the spacer
+ * wrong and the frame at its full height. */
+.frame {
+  position: relative;
+}
+
+[data-pida-pinned="true"] .frame {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- step */
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--index) minmax(0, 1fr);
+  column-gap: var(--leader);
+}
+
+/* --------------------------------------------------------------- index */
+
+.index {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Big, quiet, and structural. It is the thing a reader scans the margin
+   for, so it gets the scale; it is not the message, so it gets no colour
+   past the first one. */
+.ordinal {
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: var(--ordinal);
+  line-height: 0.85;
+  /* Funnel Display is wide and opens up at size. Two digits set at 42px need
+     more tracking pulled out of them than the heading does, or 01 reads as
+     0 1. */
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--pida-fg-faint);
+}
+
+/* The step the section opens on carries the accent, as the reference's
+   first chip does. */
+.ordinal[data-active] {
+  color: var(--pida-action);
+}
+
+/* Runs from under the ordinal, through the list gap, to the next one. */
+.indexRule {
+  position: absolute;
+  left: 0;
+  top: calc(var(--ordinal) * 0.85 + 40px);
+  bottom: calc(-1 * var(--step-gap));
+  width: 1px;
+  background: var(--pida-edge);
+}
+
+/* ------------------------------------------------------------- content */
+
+.content {
+  position: relative;
+  width: 100%;
+}
+
+/* ----------------------------------------------------------- leader
+ *
+ * The same figure the sheets section uses: a level hairline out of the rail,
+ * ending in a small square node on the panel's near corner. Below 768px
+ * there is no gap to run it through, so it goes. */
+
+.connector {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .connector {
+    position: absolute;
+    top: 18px;
+    left: calc(-1 * var(--leader));
+    display: flex;
+    align-items: center;
+    width: var(--leader);
+    color: var(--pida-edge-strong);
+    pointer-events: none;
+  }
+
+  .step:nth-child(1) .connector {
+    color: var(--pida-action);
+  }
+}
+
+.connectorLine {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.connectorNode {
+  flex: none;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+}
+
+/* --------------------------------------------------------------- panel */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  width: 100%;
+  padding: 6px;
+  overflow: clip;
+  border-radius: var(--pida-r-xl);
+  /* Was a literal #161616, which was a hand-picked step above the old 17%
+     page and is now almost invisible against a 13% one. The ramp already has
+     a name for this surface. */
+  background: var(--pida-bg-raised);
+}
+
+/* Every leader now arrives at the top left, so the wash and the masked edge
+   are anchored there for all four panels rather than mirrored per row. */
+.panelWash,
+.panelEdge {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.panel[data-first] .panelWash,
+.panel[data-first] .panelEdge {
+  opacity: 1;
+}
+
+.panelWash {
+  background-image: radial-gradient(
+    150% 90% at 0% 0%,
+    rgba(255, 54, 22, 0.1),
+    rgba(255, 54, 22, 0) 70%
+  );
+}
+
+.panelEdge {
+  border-radius: inherit;
+  border: 0.5px solid var(--pida-action);
+  -webkit-mask-image: radial-gradient(
+    ellipse 60% 48% at 0% 0%,
+    #000 30%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    ellipse 60% 48% at 0% 0%,
+    #000 30%,
+    transparent 72%
+  );
+}
+
+/* Every panel that is not the first still needs an edge, just a neutral
+   one, or it dissolves into the page. */
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--pida-edge);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------- stage */
+
+.stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: clamp(170px, 14vw, 210px);
+  width: 100%;
+  padding: clamp(16px, 1.8vw, 26px);
+  border-radius: var(--pida-r-lg);
+  background: var(--pida-bg);
+  /* On a dark page a raised surface reads from its top highlight, not from a
+     drop shadow (tokens.css). */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.028);
+  overflow: hidden;
+}
+
+/* The ground. Every stage held its content in an undesigned black rectangle;
+   the section is meant to look like an engineering document, and an
+   engineering document has ruled paper under the drawing. The grid is masked
+   to an ellipse so it never reaches an edge and turns into a table. */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(229, 229, 229, 0.042) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(229, 229, 229, 0.042) 1px, transparent 1px);
+  background-size: 30px 30px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 96% 88% at 50% 42%,
+    #000 18%,
+    transparent 76%
+  );
+  mask-image: radial-gradient(
+    ellipse 96% 88% at 50% 42%,
+    #000 18%,
+    transparent 76%
+  );
+  pointer-events: none;
+}
+
+/* Registration marks: four corner ticks, as a drawing sheet carries. Eight
+   one-pixel background layers, no extra element and no image. */
+.stage::after {
+  --tick: var(--pida-edge-strong);
+  --len: 11px;
+  content: "";
+  position: absolute;
+  inset: 11px;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick));
+  background-size: var(--len) 1px, 1px var(--len), var(--len) 1px,
+    1px var(--len), var(--len) 1px, 1px var(--len), var(--len) 1px,
+    1px var(--len);
+  background-position: left top, left top, right top, right top, left bottom,
+    left bottom, right bottom, right bottom;
+}
+
+/* The content sits over the ground, never under it. */
+.stage > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* The first step's sheet is the one carrying the accent, so its marks do
+   too. One accent moment in the section, and this is where it already is. */
+.panel[data-first] .stage::after {
+  --tick: var(--pida-action);
+}
+
+.stage > figure {
+  width: 100%;
+  align-self: center;
+}
+
+/* A framed figure brings its own border, radius and shadow. Inside the
+   stage that would be a second box around a box, so it is flattened and the
+   stage's own surface carries it. */
+.stage > figure :global(.frame) {
+  border: 0;
+  border-radius: var(--pida-r-md);
+  box-shadow: none;
+  background: transparent;
+}
+
+.stage > figure :global(.placeholder) {
+  min-height: 0;
+  border-radius: var(--pida-r-md);
+  background: var(--pida-bg-raised);
+}
+
+/* ---------------------------------------------------------------- card */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  padding: clamp(18px, 1.8vw, 26px);
+  overflow: clip;
+  border-radius: var(--pida-r-lg);
+  /* One step above the panel it sits in, from the ramp rather than from
+     another literal. The step is wider than the old #161616 to #181818,
+     because a darker page needs a bigger interval to read as raised at all. */
+  background: var(--pida-bg-well);
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.24), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cardSheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0.357px 1.071px rgba(255, 255, 255, 0.07);
+}
+
+.cardTitle {
+  /* Display, not the body sans. This is the name of the step and the most
+     important line in the panel; set in the body face it was a bold label
+     sitting 1.2x above its own paragraph, which is the flat, templated look.
+     The display face at 24px against Funnel Sans at 15.5px gives both a size
+     ratio and a face contrast, and the file already speaks display at this
+     size in .verdictFigure. */
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(20px, 1.7vw, 25px);
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+  color: var(--pida-fg);
+  /* Four-word titles should not drop one word to a second line alone. */
+  text-wrap: balance;
+}
+
+.cardBody {
+  /* 68ch at 15px in an 840px panel is a long line for a short paragraph.
+     Pulling the measure in and opening the leading is most of what separates
+     comfortable body copy from cheap body copy. */
+  max-width: 58ch;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--pida-fg-muted);
+  text-wrap: pretty;
+}
+
+/* --------------------------------------------------------------- meter */
+
+.meter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  margin-top: 14px;
+}
+
+.meter span {
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(229, 229, 229, 0.14);
+}
+
+.meter span[data-lit] {
+  background: var(--pida-action);
+}
+
+/* ------------------------------------------------- 01, the wizard steps */
+
+/* There are exactly nine wizard steps, so they are set as nine: three
+   columns of three, each column as wide as its own widest label. Wrapped
+   ragged they read as an unspecified pile of tags. */
+.chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: 9px 10px;
+  width: 100%;
+}
+
+@media (min-width: 620px) {
+  .chips {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wizardChip {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--pida-edge-strong);
+  border-radius: var(--pida-r-full);
+  background: var(--pida-bg-raised);
+  font-family: var(--pida-font-mono);
+  font-size: 12.5px;
+  line-height: 1.3;
+  letter-spacing: 0.008em;
+  color: var(--pida-fg-muted);
+  white-space: nowrap;
+}
+
+/* The step the drawing comes out of is the only one carrying the accent. */
+.wizardChip:last-child {
+  border-color: var(--pida-action-edge);
+  background: var(--pida-action-wash);
+  color: var(--pida-fg);
+}
+
+/* ---------------------------------------------------- 03, the verdict */
+
+.verdict {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.verdictLabel {
+  display: block;
+  /* .mono-label is 11px site-wide. In a panel this size it needs one more
+     step to read as a title block label rather than fine print. */
+  font-size: 12px;
+  letter-spacing: 0.11em;
+}
+
+.verdictFigure {
+  margin-top: 12px;
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(44px, 4.6vw, 66px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--pida-ok);
+}
+
+.verdictDetail {
+  margin-top: 8px;
+  font-family: var(--pida-font-mono);
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pida-fg-muted);
+}
+
+.verdictNote {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pida-edge);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--pida-fg-faint);
+}
+
+/* ---------------------------------------------- 04, the package written */
+
+.deliverables {
+  display: grid;
+  align-content: center;
+  gap: 9px 28px;
+  width: 100%;
+}
+
+/* Ten items stacked down one edge of a panel this wide leaves the other two
+   thirds empty and makes the list look longer than it is. Two columns read
+   as a delivered set. */
+@media (min-width: 620px) {
+  .deliverables {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-template-rows: repeat(5, auto);
+  }
+}
+
+.deliverables li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--pida-font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.008em;
+  color: var(--pida-fg-muted);
+}
+
+.deliverables li::before {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--pida-action);
+  transform: translateY(-2px);
+}
+
+
+/* ------------------------------------------------- the pinned sequence
+ *
+ * These only ever apply while the one pinned sequence of the site is running
+ * (A6.10, C7.3, section 01 only, >=1024px, fine pointer, no reduced motion).
+ * The motion layer writes data-pida-active and data-pida-passed on each step;
+ * without JavaScript neither attribute exists and none of this matches, so
+ * the section is exactly the stack it is today.
+ *
+ * Colour is changed here by a state transition rather than by a tween,
+ * because C7.1 allows only transform, opacity, clip-path and
+ * stroke-dashoffset to be animated. A6.10 puts interface state changes in a
+ * separate category at 120 to 200 ms, which is what these are. */
+
+.step[data-pida-passed] .ordinal,
+.step[data-pida-active] .panel,
+.step[data-pida-active] .panelWash,
+.step[data-pida-active] .panelEdge {
+  transition: opacity 200ms var(--pida-ease), color 200ms var(--pida-ease);
+}
+
+.step[data-pida-passed="true"] .ordinal {
+  color: var(--pida-action);
+}
+
+.step[data-pida-passed="false"] .ordinal {
+  color: var(--pida-fg-faint);
+}
+
+/* A step the sequence has not reached yet shows an empty meter, so the meter
+   fills as the reader advances rather than sitting full under a grey
+   ordinal. Its lit segments come back the moment the step is passed. */
+.step[data-pida-passed="false"] .meter span[data-lit] {
+  background: rgba(229, 229, 229, 0.14);
+}
+
+.step .meter span {
+  transition: background-color 200ms var(--pida-ease);
+}
+
+/* The step being read is at full strength; the others stand back. Not so far
+   back that they stop being legible, because they are still on the screen. */
+.step[data-pida-active="false"] .panel {
+  opacity: 0.4;
+}
+
+.step[data-pida-active="true"] .panel {
+  opacity: 1;
+}
+
+/* The accent moves with the sequence instead of sitting on step 01, so the
+   section still shows exactly one accented panel at a time. */
+.step[data-pida-active="true"] .panelWash,
+.step[data-pida-active="true"] .panelEdge {
+  opacity: 1;
+}
+
+.step[data-pida-active="false"] .panelWash,
+.step[data-pida-active="false"] .panelEdge {
+  opacity: 0;
+}
+
+.step[data-pida-active="true"] .stage::after {
+  --tick: var(--pida-action);
+}
+
+.step[data-pida-active="false"] .stage::after {
+  --tick: var(--pida-edge-strong);
+}

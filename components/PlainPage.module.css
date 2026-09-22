@@ -1,0 +1,38 @@
+/* The small-page template, A6.16 and C6.4. */
+
+.page {
+  /* Full height, so a short page still fills the window and the footer sits
+     below the fold rather than halfway up it. The bar is sticky and sits in
+     the flow above this, so its own height is subtracted here.
+
+     The floor on the top padding clears the accent strip that hangs about
+     28px behind the bar. */
+  min-block-size: calc(100svh - 58px);
+  padding-top: clamp(56px, 6vw, 80px);
+}
+
+.column {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* The h1 sits close under its eyebrow; everything else is spaced by the
+     content itself, so that this template does not impose a rhythm on the
+     legal pages. */
+  gap: var(--pida-space-3);
+}
+
+.eyebrow {
+  color: var(--pida-ink-2);
+}
+
+/* From 1024px: column 3, spanning 7. Sign-up pages span 5 (A6.16). */
+@media (min-width: 1024px) {
+  .text {
+    grid-column: 3 / span 7;
+  }
+
+  .signup {
+    grid-column: 3 / span 5;
+  }
+}

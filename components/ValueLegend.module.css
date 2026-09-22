@@ -1,0 +1,65 @@
+/* Value legend. Four chips built as a real interface element, reused in the
+   trust block.
+ *
+ * The four states differ by fill, outline and outline style, not by hue
+ * alone, so they survive greyscale printing and colour blindness. Only one
+ * of them carries the accent, because the page has one accent. */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pida-space-2);
+}
+
+.chip {
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--pida-r-full);
+  font-family: var(--pida-font-mono);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.compact .chip {
+  font-size: 12px;
+  padding: 3px 8px;
+}
+
+/* Solid accent fill. Near-black text, not white: white on this orange is
+   3.6:1 and fails AA at 13px. Near-black is 5.4:1. */
+.given {
+  background: var(--pida-action);
+  color: var(--pida-on-action);
+}
+
+/* 1px accent outline, ink text, a small superscript citation mark. */
+.sourced {
+  border-color: var(--pida-action);
+  color: var(--pida-fg);
+}
+
+.sourced sup {
+  font-size: 9px;
+  margin-left: 1px;
+  color: var(--pida-action);
+}
+
+/* 1px ink outline, muted text, a fill of 45-degree hairlines. */
+.assumed {
+  border-color: var(--pida-fg-faint);
+  color: var(--pida-fg-muted);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--pida-edge-strong) 0,
+    var(--pida-edge-strong) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+/* 1px dashed outline, faint text, no fill. */
+.empty {
+  border-style: dashed;
+  border-color: var(--pida-edge-strong);
+  color: var(--pida-fg-faint);
+}

@@ -1,0 +1,122 @@
+/* The wide band. The one centred composition on the page: everything else is
+   left aligned, so this reads as a break in the rhythm rather than as the
+   default. It sits a step down the ramp, not on a different theme. */
+
+.band {
+  background: var(--pida-bg-sunken);
+  border-bottom: 1px solid var(--pida-edge);
+  text-align: center;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 62rem;
+}
+
+/* The wash rises from the bottom right of the heading box. On a centred
+   heading that reads as lit from one corner, which is the intent. */
+.heading {
+  max-width: 18ch;
+}
+
+.sub {
+  margin-top: var(--pida-space-5);
+  max-width: 58ch;
+}
+
+.cta {
+  margin-top: clamp(24px, 3vw, 36px);
+}
+
+.rule {
+  width: 100%;
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+.formats {
+  margin-top: clamp(28px, 3vw, 40px);
+  max-width: 56ch;
+  font-size: clamp(17px, 1.6vw, 21px);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--pida-fg);
+}
+
+/* ------------------------------------------------- the format chips
+ *
+ * The four chips arrive closed into one pill and separate. Because that
+ * means the outline has to belong to the run at one moment and to each chip
+ * at another, no element here draws a border on itself: the outlines are
+ * their own layers, so the whole move is opacity and transform and nothing
+ * reflows. components/motion/formatSplit.ts drives it.
+ *
+ * The rest state below is the row exactly as it was before any of this:
+ * .fused transparent, every .skin opaque, every .seam transparent. Nothing
+ * is waiting on a tween.
+ */
+
+.formatWrap {
+  position: relative;
+  margin-top: var(--pida-space-5);
+}
+
+/* The single outline around the closed run. Its width and height are
+   measured and set by the motion layer, because they are the sum of four
+   chips and no stylesheet can know that. */
+.fused {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid var(--pida-edge-strong);
+  border-radius: var(--pida-r-full);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.formatList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--pida-space-2);
+}
+
+/* The 6/15 padding is the old 5/14 plus the 1px border that used to sit on
+   this element and now sits on .skin, so the chip measures the same as it
+   always did. */
+.format {
+  position: relative;
+  padding: 6px 15px;
+  color: var(--pida-fg-muted);
+  letter-spacing: 0.06em;
+}
+
+.skin {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--pida-edge-strong);
+  border-radius: var(--pida-r-full);
+  pointer-events: none;
+}
+
+/* The division between two formats while the run is still closed. It is on
+   the leading edge of each chip, and the motion layer leaves the first one
+   dark because there is nothing to its left to divide it from. */
+.seam {
+  position: absolute;
+  left: 0;
+  top: 26%;
+  bottom: 26%;
+  width: 1px;
+  background: var(--pida-edge-strong);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 479px) {
+  .cta {
+    width: 100%;
+  }
+}

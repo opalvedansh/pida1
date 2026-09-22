@@ -1,0 +1,31 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next/
+/out/
+
+# typescript incremental build state
+*.tsbuildinfo
+
+# tooling output
+/graphify-out/
+
+# macOS
+.DS_Store
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local environment. NEXT_PUBLIC_SIGNUP_ORIGIN and NEXT_PUBLIC_ASK_ENDPOINT
+# are set per environment at build time and are not secret, but a local
+# override file still does not belong in the repository.
+.env
+.env*.local
+.env.production
+
+# deploy
+.vercel

@@ -1,0 +1,115 @@
+/* TrialPanel, C3.6. Sizes from A6.8: the two buttons are the same width, at
+   most 320px, at least 48px high and 12px apart. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: var(--pida-space-5);
+}
+
+.lede {
+  color: var(--pida-ink);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-3);
+  width: 100%;
+  max-width: 320px;
+  margin-top: var(--pida-space-7);
+}
+
+/* The two provider buttons follow each provider's own brand rules for mark,
+   colour, label and minimum size (0.4, A6.8, C3.6). That is why the values
+   below are literal and not tokens of C4.1: they belong to the providers,
+   not to this palette, and they are the only such values on the site. The
+   4px corner is the providers' own, against the 2px of the rest of the site.
+
+   Class names and the style sheet carry no provider name: the two buttons
+   are told apart by the data-provider attribute that C3.6 requires. */
+.provider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pida-space-3);
+  min-height: 48px;
+  padding-inline: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--pida-font-body);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms var(--pida-ease),
+    border-color 120ms var(--pida-ease);
+}
+
+.provider[data-provider="google"] {
+  background: #ffffff;
+  border-color: #747775;
+  color: #1f1f1f;
+}
+
+.provider[data-provider="google"]:hover,
+.provider[data-provider="google"]:active {
+  background: #f2f2f2;
+}
+
+.provider[data-provider="linkedin"] {
+  background: #0a66c2;
+  color: #ffffff;
+}
+
+.provider[data-provider="linkedin"]:hover,
+.provider[data-provider="linkedin"]:active {
+  background: #004182;
+}
+
+.mark {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.consent {
+  margin-top: var(--pida-space-5);
+  max-width: 44ch;
+}
+
+.data {
+  margin-top: var(--pida-space-3);
+  color: var(--pida-ink-2);
+}
+
+.hairline {
+  width: 100%;
+  max-width: var(--pida-measure);
+  margin-top: var(--pida-space-7);
+}
+
+/* The two clauses of the mono line of A7.2, kept in their exact words. The
+   slash is the divider the copy gives; it takes the rule colour so the two
+   clauses read as the line and not as the separator. */
+.assurance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pida-space-3);
+  margin-top: var(--pida-space-4);
+  color: var(--pida-ink-2);
+}
+
+.slash {
+  color: var(--pida-rule);
+}
+
+/* /trial prints without the provider buttons; that is accepted (C6.5). */
+@media print {
+  .buttons {
+    display: none;
+  }
+}

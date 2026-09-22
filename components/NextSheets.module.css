@@ -1,0 +1,431 @@
+/* The sheets above the line.
+ *
+ * Every colour here resolves to a token in tokens.css, so the section
+ * recolours with the page and never introduces a second accent. The board
+ * that this was drawn from used its own warm amber and its own type; the
+ * accent lock and the type lock take precedence, and the drawing is built so
+ * that swapping --pida-action is the only edit a recolour needs.
+ *
+ * Three states, driven by data-state on both the plate group and its words:
+ *
+ *   rest  nothing is picked or pointed at. Neutral linework.
+ *   lit   the accent runs through the whole sheet, not round its edge: the
+ *         chip and title, the edge, the linework, a warm face and a blurred
+ *         pool of the accent underneath.
+ *   dim   the other two, at about a third.
+ *
+ * The opening is a CSS transform. See the head of NextSheets.tsx for why one
+ * translate is the exact same picture as a partly multiplied lift.
+ */
+
+.section {
+  border-bottom: 1px solid var(--pida-edge);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-5);
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.headSub {
+  max-width: 58ch;
+}
+
+/* ------------------------------------------------------------- the board */
+
+.board {
+  --side: clamp(190px, 22vw, 290px);
+  --gutter: clamp(14px, 1.8vw, 30px);
+  /* One sheet's travel, and the share of it each sheet waits. */
+  --open-dur: 900ms;
+  --open-step: 90ms;
+  --open-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--side) minmax(0, 1fr) var(--side);
+  column-gap: var(--gutter);
+}
+
+/* width 100% with height auto lets the viewBox set the height, so the
+   percentage tops below land on the leader nodes at any width. */
+/* The drawing's own cell in the stage grid. The scene's box is this cell
+   exactly, so the crossfade is a straight swap of two identical pictures. */
+.figure {
+  position: relative;
+  grid-column: 2;
+}
+
+/* The scene. Absent entirely unless the machine qualified, and invisible
+   until it has rendered a frame (see sheets3d/useSheets3d). */
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms var(--pida-ease);
+}
+
+[data-dimensional="true"] .canvas {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Once the scene has a frame the drawing steps back, but it is never
+   removed: it still carries the alt text, the leaders and the words. */
+[data-dimensional="true"] .plan .ground,
+[data-dimensional="true"] .plan .plate .sheet {
+  opacity: 0;
+  transition: opacity 400ms var(--pida-ease);
+}
+
+.plan {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------- the ground plane */
+
+.ground {
+  shape-rendering: geometricPrecision;
+}
+
+.groundFace {
+  fill: var(--pida-bg);
+}
+
+.groundEdge {
+  fill: rgba(0, 0, 0, 0.6);
+}
+
+.groundGrid {
+  fill: none;
+  stroke: var(--pida-fg);
+  stroke-opacity: 0.05;
+  stroke-width: 1;
+}
+
+/* Solid, because this one is drawn. */
+.groundLine {
+  fill: none;
+  stroke: var(--pida-edge-strong);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------ the sheets */
+
+.sheet {
+  transition: transform var(--open-dur) var(--open-ease);
+  transition-delay: calc(var(--i) * var(--open-step));
+}
+
+.thickness {
+  fill: rgba(0, 0, 0, 0.6);
+}
+
+.sheetFace {
+  fill: var(--pida-bg-raised);
+  transition: fill 200ms ease;
+}
+
+/* Dashed, because none of these is drawn yet. */
+.sheetEdge {
+  fill: none;
+  stroke: var(--pida-edge-strong);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+  stroke-dasharray: 7 5;
+  transition: stroke 200ms ease, stroke-opacity 200ms ease;
+}
+
+.ink {
+  fill: none;
+  stroke: var(--pida-fg-faint);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: stroke 200ms ease, fill 200ms ease, opacity 200ms ease;
+}
+
+.inkSolid {
+  fill: var(--pida-fg-faint);
+  stroke: none;
+}
+
+/* The warm face: the accent laid over the sheet, not a second grey. */
+.warm {
+  fill: var(--pida-action);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+/* The pool of accent under a lit sheet. Off at rest, so nothing glows. It is
+   pushed below the sheet so it reads as light falling on what is under it,
+   and never as a halo traced round the edge. */
+.glow {
+  fill: var(--pida-action);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 200ms ease;
+}
+
+.hit {
+  fill: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------- the leaders */
+
+.leader {
+  fill: none;
+  stroke: var(--pida-fg);
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+  transition: stroke 200ms ease, stroke-opacity 200ms ease, opacity 420ms ease;
+}
+
+.leaderNode {
+  fill: var(--pida-fg);
+  fill-opacity: 0.34;
+  transition: fill 200ms ease, fill-opacity 200ms ease, opacity 420ms ease;
+}
+
+/* ------------------------------------------------------------ the words */
+
+.note {
+  position: absolute;
+  top: var(--top);
+  width: var(--side);
+  /* Sit the chip line on the leader node rather than under it. */
+  margin-top: -0.55em;
+  display: grid;
+  gap: 7px;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  transition: opacity 420ms ease, transform 420ms var(--open-ease);
+}
+
+/* The global ring is drawn at a 2px offset, which lands on the descenders of
+   the last line. These blocks are text with no box of their own, so the ring
+   needs room to read as a ring and not as a border. */
+.note:focus-visible {
+  outline-offset: 7px;
+  border-radius: var(--pida-r-sm);
+}
+
+.note[data-side="left"] {
+  left: 0;
+  text-align: right;
+  justify-items: end;
+}
+
+.note[data-side="right"] {
+  right: 0;
+  text-align: left;
+  justify-items: start;
+}
+
+.noteHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.noteTag {
+  transition: color 200ms ease;
+}
+
+/* The display face, not the body sans. This is the name of a sheet, and at
+   16px semibold Funnel Sans it was the same face and nearly the same size as
+   the paragraph under it, which is the flat look the rest of the page has
+   already been pulled out of. The section heading is .display-l above it and
+   the body is 14px below it, so this sits between them and belongs to
+   neither. Kept under 20px because the column is only 290px wide and a
+   right-aligned title that wraps to three lines is harder to read than a
+   smaller one that wraps to two. */
+.noteTitle {
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(17px, 1.35vw, 19px);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--pida-fg);
+  transition: color 200ms ease;
+}
+
+.noteBody {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--pida-fg-muted);
+  transition: color 200ms ease;
+}
+
+/* ------------------------------------------------------------- the label */
+
+.groundLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding-left: calc(var(--side) + var(--gutter));
+  color: var(--pida-fg-faint);
+  text-transform: none;
+  letter-spacing: 0.06em;
+}
+
+.groundLabel::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  /* Half a line down, so it sits on the first line and not between two. */
+  margin-top: 0.62em;
+  background: var(--pida-edge-strong);
+  flex: none;
+}
+
+/* -------------------------------------------------------------- 3 states */
+
+/* A pool under the sheet, not a rim around it. The accent on this page is a
+   hot red, so this stays low: at the board's own 0.4 it stops being a lit
+   sheet and becomes a neon outline, which is the one thing A6.11 bans. */
+.plate[data-state="lit"] .glow {
+  opacity: 0.2;
+}
+
+.plate[data-state="lit"] .warm {
+  opacity: 0.055;
+}
+
+.plate[data-state="lit"] .sheetFace {
+  fill: var(--pida-bg-well);
+}
+
+/* The edge carries the accent, the linework comes up to full ink. Accent on
+   both turns the sheet into one red mass and the drawing stops reading. */
+.plate[data-state="lit"] .sheetEdge,
+.plate[data-state="lit"] .leader {
+  stroke: var(--pida-action);
+  stroke-opacity: 1;
+}
+
+.plate[data-state="lit"] .ink {
+  stroke: var(--pida-fg);
+}
+
+.plate[data-state="lit"] .inkSolid {
+  fill: var(--pida-fg);
+}
+
+.plate[data-state="lit"] .leaderNode {
+  fill: var(--pida-action);
+  fill-opacity: 1;
+}
+
+.plate[data-state="dim"] {
+  opacity: 0.34;
+}
+
+.note[data-state="lit"] .noteTag,
+.note[data-state="lit"] .noteTitle {
+  color: var(--pida-action);
+}
+
+/* The sheets drop to a third; the words only halfway. A latched sheet with
+   the pointer away is a resting state, not a passing one, and at a third the
+   other two blocks of body copy fall under AA and stop being readable. The
+   drawing can go that dark because it is a drawing. */
+.note[data-state="dim"] {
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------- closed and open */
+
+/* The server renders it open. The client closes it before first paint and
+   the observer opens it once, a sixth of the way in. With JavaScript off, or
+   under reduced motion, this block never applies and nothing moves. */
+
+.board[data-phase="closed"] .sheet {
+  transform: translateY(var(--lift));
+}
+
+.board[data-phase="closed"] .leader,
+.board[data-phase="closed"] .leaderNode {
+  opacity: 0;
+}
+
+.board[data-phase="closed"] .note {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Leaders and words arrive as their own sheet lands, not before it. */
+.board .leader,
+.board .leaderNode,
+.board .note {
+  transition-delay: calc(var(--i) * var(--open-step) + 430ms);
+}
+
+/* ------------------------------------------------------- the phone column
+   The leaders and the margins stop working once there is no margin left to
+   put words in. The stack becomes one picture and the words become a plain
+   list under it. The words are never moved inside the SVG.
+
+   The board puts this switch at 1024 px. Measured with this copy it is 1280:
+   01 and 03 share the left margin, and the gap between their two leader
+   nodes is a share of the drawing's height, so it shrinks with the drawing
+   while the words do not. Below about 1280 the two blocks start to crowd. */
+
+@media (max-width: 1279px) {
+  .stage {
+    display: block;
+  }
+
+  .plan {
+    width: 100%;
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+
+  .leader,
+  .leaderNode {
+    display: none;
+  }
+
+  .note {
+    position: static;
+    width: 100%;
+    margin-top: 0;
+    padding: 18px 0;
+    border-top: 1px solid var(--pida-edge);
+    text-align: left;
+    justify-items: start;
+  }
+
+  .note[data-side="left"],
+  .note[data-side="right"] {
+    text-align: left;
+    justify-items: start;
+  }
+
+  .noteBody {
+    max-width: 62ch;
+  }
+
+  .groundLabel {
+    padding-left: 0;
+    margin-top: 20px;
+  }
+}

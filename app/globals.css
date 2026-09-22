@@ -1,0 +1,27 @@
+/* Self-hosted brand faces. Four families: a display, a body sans, an italic
+   serif for the one accent word per heading, and a mono.
+
+   Never load fonts from a third-party font host: it adds an origin, and the
+   host name would fail the banned-terms check. Every face below is served
+   from this origin out of node_modules.
+
+   Bodoni Moda stands in for the reference's Redaction, which is not
+   redistributable through a package. It is the nearest free match in
+   structure: the same high-stroke-contrast Didone skeleton, the same narrow
+   italic. Only the italic is loaded, because the roman is never used. */
+@import "@fontsource/funnel-display/400.css";
+@import "@fontsource/funnel-display/500.css";
+@import "@fontsource/funnel-sans/400.css";
+@import "@fontsource/funnel-sans/500.css";
+@import "@fontsource/funnel-sans/600.css";
+@import "@fontsource/bodoni-moda/400-italic.css";
+@import "@fontsource/geist-mono/400.css";
+@import "@fontsource/geist-mono/500.css";
+
+@import "../styles/tokens.css";
+@import "../styles/base.css";
+
+/* The bar is sticky, not fixed, so it occupies real layout space and needs
+   no clearance on main. The only thing that hangs into the page is the
+   accent strip behind the pill, which is about 28px deep; each page's first
+   section carries enough top padding to clear it. */

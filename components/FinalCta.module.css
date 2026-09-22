@@ -1,0 +1,45 @@
+/* Final call to action. The last band before the footer, one step down the
+   ramp, and the only place on the page where the display face runs at its
+   full size after the hero. */
+
+.final {
+  background: var(--pida-bg-sunken);
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .final {
+    display: grid;
+    place-items: center;
+    min-height: 60vh;
+  }
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heading {
+  max-width: 16ch;
+}
+
+.sub {
+  margin-top: var(--pida-space-5);
+  max-width: 46ch;
+}
+
+.cta {
+  margin-top: clamp(28px, 3vw, 40px);
+}
+
+.note {
+  margin-top: var(--pida-space-5);
+}
+
+@media (max-width: 479px) {
+  .cta {
+    width: 100%;
+  }
+}

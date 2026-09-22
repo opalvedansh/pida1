@@ -1,0 +1,17 @@
+A coding agent takes a task — fix this bug, build this feature — and works it in a real dev environment: reading your code, editing files, running tests, and opening a pull request when it's done. You review the result, not every keystroke.
+
+No. Hoplite is designed for founders and operators who prefer explaining tasks in plain English over creating flowcharts. If you can send a Slack message describing the job, you can build an agent.
+
+GitHub for repositories and pull requests, Linear for issues, Slack for updates, and anything that speaks MCP. Inside the sandbox, agents can also install and use your project's own tooling.
+
+Anything you'd hand a teammate with a fresh checkout: features, bug fixes, refactors, test coverage, dependency upgrades, review follow-ups. Each thread runs in its own sandbox with your environment mirrored.
+
+No. File edits, shell commands, and pull-request actions can each be gated on your explicit approval, and everything the agent does streams live so you can step in at any point.
+
+Every thread gets a real machine, not a text buffer: dependencies installed, tests running, and your app booted on a live preview URL the agent checks its own work against. And you can run a hundred of them at once.
+
+It stays yours. Every session runs in an isolated sandbox, your code and credentials are encrypted in transit and at rest, and neither we nor the model providers train on your data.
+
+Start solo on Free with no long-term commitment, or try Pro before paying to add team capacity and included per-seat credits.
+
+Hoplites were the citizen-soldiers of ancient Greece — capable alone, devastating in formation. One agent is useful; a phalanx of them ships your whole backlog.

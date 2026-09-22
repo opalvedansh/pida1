@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"^#\\\\{1,3\\\\} \" WEBSITE_HANDOFF.md)",
+      "Bash(npm view *)",
+      "Bash(npm install *)",
+      "Bash(npx astro *)",
+      "Bash(npm audit *)",
+      "Bash(sed -n '120,280p' /Users/vedansh/.claude/skills/avoid-ai-design/references/ai-tells-catalog.md)",
+      "Read(//Users/vedansh/.claude/skills/avoid-ai-design/references/**)"
+    ]
+  }
+}

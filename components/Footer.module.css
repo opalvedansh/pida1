@@ -1,0 +1,131 @@
+/* Footer. The bottom step of the ramp, under a hairline. */
+
+.footer {
+  background: var(--pida-bg-sunken);
+  border-top: 1px solid var(--pida-edge);
+  padding-block: clamp(48px, 6vw, 80px) var(--pida-space-6);
+}
+
+.cols {
+  display: grid;
+  gap: clamp(32px, 4vw, 48px);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 620px) {
+  .cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cols {
+    grid-template-columns: 4fr 3fr 3fr 3fr;
+  }
+
+  .brand {
+    grid-column: auto;
+  }
+}
+
+/* --------------------------------------------------------------- brand */
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-4);
+}
+
+.wordmarkLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--pida-fg);
+}
+
+.mark {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--pida-r-xs);
+  background: var(--pida-fg);
+  clip-path: polygon(0 0, 100% 0, 100% 58%, 58% 58%, 58% 100%, 0 100%);
+}
+
+.mark::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 42%;
+  height: 42%;
+  border-radius: 1px;
+  background: var(--pida-action);
+}
+
+.wordmark {
+  font-family: var(--pida-font-display);
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  max-width: 32ch;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------- columns */
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-4);
+}
+
+.colHead {
+  color: var(--pida-fg-faint);
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.list a {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--pida-fg-muted);
+  text-decoration: none;
+  transition: color var(--pida-dur-ui) var(--pida-ease);
+}
+
+.list a:hover {
+  color: var(--pida-fg);
+}
+
+/* --------------------------------------------------------------- bottom */
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--pida-space-4);
+  margin-top: clamp(40px, 5vw, 64px);
+  padding-top: var(--pida-space-5);
+  border-top: 1px solid var(--pida-edge);
+}
+
+.standards {
+  max-width: 62ch;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--pida-font-body);
+  font-size: 12px;
+  line-height: 1.5;
+}

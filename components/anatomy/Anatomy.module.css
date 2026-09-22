@@ -1,0 +1,212 @@
+/* The sheet, exploded.
+ *
+ * TWO LAYOUTS, ONE MARKUP, as the hero does it. Everything outside the
+ * [data-anatomy="on"] block is the static page: one screen, the heading and
+ * the four labels in document order, no pinning and no tall runway. That is
+ * what renders with JavaScript off, under reduced motion, and on a machine
+ * with no WebGL. Anatomy.tsx sets the attribute only once it has a scene.
+ *
+ * The background is --pida-bg-sunken rather than #000. At oklch 10% it is
+ * indistinguishable from black behind a lit render, and tokens.css is
+ * explicit that the page never uses pure black.
+ */
+
+.runway {
+  position: relative;
+  background: var(--pida-bg-sunken);
+}
+
+/* ------------------------------------------------------- static layout */
+
+.pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5vw, 56px);
+  padding: clamp(40px, 6vh, 72px) var(--pida-margin) clamp(56px, 8vh, 96px);
+}
+
+/* With no scene there is nothing to look at, so the canvas takes no room.
+   data-ready is set by the script once a context exists. */
+.canvas {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas[data-ready] {
+  display: block;
+}
+
+.intro {
+  max-width: 34ch;
+}
+
+.heading {
+  margin-bottom: clamp(14px, 2vh, 22px);
+}
+
+.introSub {
+  max-width: 44ch;
+}
+
+/* Two columns held to the page's reading width rather than spread across
+   the whole container, which left the right third of the row empty. */
+.margins {
+  display: grid;
+  gap: clamp(28px, 4vw, 44px) clamp(32px, 4vw, 56px);
+  width: 100%;
+  max-width: 62rem;
+}
+
+@media (min-width: 768px) {
+  .margins {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 38ch;
+}
+
+.labelTag {
+  color: var(--pida-action);
+}
+
+.labelTitle {
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(18px, 1.5vw, 22px);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: var(--pida-fg);
+  text-wrap: balance;
+}
+
+.labelBody {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--pida-fg-muted);
+}
+
+/* --------------------------------------------------- the scrubbed stage */
+
+/* The runway. vh rather than dvh: a runway that resizes as the mobile
+   address bar retracts drags the scrubber with it. */
+.runway[data-anatomy="on"] {
+  height: 340vh;
+}
+
+.runway[data-anatomy="on"] .pane {
+  position: sticky;
+  top: 0;
+  display: block;
+  height: 100vh;
+  /* svh, not dvh: the pinned pane must not resize while it is pinned. */
+  height: 100svh;
+  padding: 0;
+  overflow: hidden;
+}
+
+.runway[data-anatomy="on"] .canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.runway[data-anatomy="on"] .intro {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--pida-header-h) + clamp(24px, 6vh, 64px));
+  left: var(--pida-margin);
+  max-width: min(46ch, 42vw);
+}
+
+.runway[data-anatomy="on"] .margins {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+}
+
+/* The labels sit in the margins the drawing leaves empty: two down the left
+   and two down the right, alternating with the layers they name. Their tops
+   are set as a share of the pane so they track the stack as it opens rather
+   than being pinned to pixels that only hold at one height. */
+.runway[data-anatomy="on"] .label {
+  position: absolute;
+  width: min(30ch, 23vw);
+  max-width: none;
+}
+
+.runway[data-anatomy="on"] .label[data-side="left"] {
+  left: var(--pida-margin);
+  text-align: right;
+  align-items: flex-end;
+}
+
+.runway[data-anatomy="on"] .label[data-side="right"] {
+  right: var(--pida-margin);
+  text-align: left;
+  align-items: flex-start;
+}
+
+.runway[data-anatomy="on"] .label:nth-child(1) {
+  top: 26%;
+}
+
+.runway[data-anatomy="on"] .label:nth-child(2) {
+  top: 40%;
+}
+
+.runway[data-anatomy="on"] .label:nth-child(3) {
+  top: 58%;
+}
+
+.runway[data-anatomy="on"] .label:nth-child(4) {
+  top: 72%;
+}
+
+/* Below 1024px there are no margins left to put words in: the drawing takes
+   the width and the labels go under it as a plain list, which is the same
+   answer the sheets board on the home page reaches at its own breakpoint. */
+@media (max-width: 1023px) {
+  .runway[data-anatomy="on"] {
+    height: 300vh;
+  }
+
+  .runway[data-anatomy="on"] .margins {
+    inset: auto 0 0 0;
+    padding: 0 var(--pida-margin) clamp(24px, 5vh, 48px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(16px, 3vw, 28px);
+  }
+
+  .runway[data-anatomy="on"] .label,
+  .runway[data-anatomy="on"] .label[data-side="left"],
+  .runway[data-anatomy="on"] .label[data-side="right"] {
+    position: static;
+    width: auto;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .runway[data-anatomy="on"] .labelBody {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .runway[data-anatomy="on"] .margins {
+    grid-template-columns: 1fr;
+  }
+
+  .runway[data-anatomy="on"] .label:nth-child(n + 3) {
+    display: none;
+  }
+}

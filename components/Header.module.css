@@ -1,0 +1,407 @@
+/* Navigation bar, built to the reference.
+ *
+ * Radius system in this file, which is the documented exception to the page's
+ * 18px card radius: the pill and the strip take 12px, the chips inside them
+ * take 8px, the hamburger target takes 8px. A 18px pill holding 8px chips
+ * reads as two unrelated shapes; 12px holding 8px reads as one control. */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--pida-z-header);
+}
+
+.wrap {
+  padding: 10px 12px 0;
+}
+
+@media (min-width: 640px) {
+  .wrap {
+    padding-inline: 24px;
+  }
+}
+
+/* ----------------------------------------------------------------- bar */
+
+.bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  padding: 8px 8px 8px 14px;
+  border-radius: 12px;
+  background: var(--pida-bg-raised);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35),
+    0 3px 3px rgba(0, 0, 0, 0.24), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: inset 0 0 1px 0.5px rgba(255, 255, 255, 0.13);
+}
+
+/* --------------------------------------------------------------- brand */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  flex-shrink: 0;
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--pida-fg);
+  text-decoration: none;
+}
+
+/* The interim wordmark glyph: a sheet with the accent notched into its lower
+   right, where a title block sits. Placeholder for the supplied logo. */
+.mark {
+  position: relative;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--pida-r-xs);
+  background: var(--pida-fg);
+  clip-path: polygon(0 0, 100% 0, 100% 58%, 58% 58%, 58% 100%, 0 100%);
+}
+
+.mark::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 42%;
+  height: 42%;
+  border-radius: 1px;
+  background: var(--pida-action);
+}
+
+/* --------------------------------------------------------------- links */
+
+.links {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .links {
+    grid-column-start: 2;
+    display: flex;
+    align-items: center;
+    gap: 27px;
+    justify-self: center;
+  }
+}
+
+.link {
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--pida-fg-muted);
+  text-decoration: none;
+  transition: opacity var(--pida-dur-ui) var(--pida-ease);
+}
+
+.link:hover {
+  opacity: 0.6;
+}
+
+/* ------------------------------------------------------------- actions */
+
+.actions {
+  grid-column-start: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-self: end;
+}
+
+/* Both chips share a geometry and differ only in surface. */
+.chip,
+.chipPrimary {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding-inline: 12px;
+  border-radius: var(--pida-r-md);
+  font-family: var(--pida-font-body);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color var(--pida-dur-ui) var(--pida-ease),
+    filter var(--pida-dur-ui) var(--pida-ease),
+    transform var(--pida-dur-ui) var(--pida-ease);
+}
+
+.chip:active,
+.chipPrimary:active {
+  transform: translateY(0.5px);
+}
+
+/* Secondary: a grey chip, one more step up the ramp than the bar. */
+.chip {
+  border: 1px solid var(--pida-edge-strong);
+  background: oklch(34% 0 0);
+  color: var(--pida-fg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@media (min-width: 640px) {
+  .chip {
+    display: inline-flex;
+  }
+}
+
+.chip:hover,
+.chip:focus-visible {
+  background: oklch(39% 0 0);
+}
+
+/* Primary: near-white with near-black text, which is what the reference's
+   dark theme resolves its primary chip to. 17:1 against its own label. */
+.chipPrimary {
+  display: inline-flex;
+  border: 1px solid oklch(95% 0 0);
+  background: oklch(95% 0 0);
+  color: oklch(15% 0 0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.chipPrimary:hover,
+.chipPrimary:focus-visible {
+  filter: brightness(1.08);
+}
+
+/* ---------------------------------------------------------------- menu */
+
+.menu {
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .menu {
+    display: none;
+  }
+}
+
+.menuButton {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--pida-r-md);
+  color: var(--pida-fg);
+  cursor: pointer;
+  list-style: none;
+  transition: background-color var(--pida-dur-ui) var(--pida-ease);
+}
+
+.menuButton::-webkit-details-marker {
+  display: none;
+}
+
+.menuButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Two rules in an 18 by 10 box, which become a cross when the sheet opens. */
+.burger {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 10px;
+}
+
+.burger span {
+  position: absolute;
+  inset-inline: 0;
+  height: 1.5px;
+  border-radius: var(--pida-r-full);
+  background: currentColor;
+  transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.burger span:first-child {
+  top: 0;
+}
+
+.burger span:last-child {
+  bottom: 0;
+}
+
+.menu[open] .burger span:first-child {
+  transform: translateY(4.25px) rotate(45deg);
+}
+
+.menu[open] .burger span:last-child {
+  transform: translateY(-4.25px) rotate(-45deg);
+}
+
+.sheet {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 14px);
+  z-index: var(--pida-z-menu);
+  width: max(62vw, 240px);
+  padding: 16px;
+  border: 1px solid var(--pida-edge);
+  border-radius: 12px;
+  background: var(--pida-bg-raised);
+  box-shadow: var(--pida-shadow-frame);
+}
+
+.sheetAnchors {
+  display: grid;
+}
+
+.sheetAnchors a {
+  display: block;
+  padding: 0.6rem 0.5rem;
+  font-size: 16px;
+  color: var(--pida-fg-muted);
+  text-decoration: none;
+}
+
+.sheetAnchors a:hover {
+  color: var(--pida-fg);
+}
+
+.sheetLegal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pida-edge);
+}
+
+.sheetLegal a {
+  font-size: 13px;
+  color: var(--pida-fg-faint);
+  text-decoration: none;
+}
+
+.sheetLegal a:hover {
+  color: var(--pida-fg);
+}
+
+/* --------------------------------------------------------------- strip
+   Sits behind the pill and starts 6px above its bottom edge, so the pill's
+   corner overlaps it and only the lower band shows. Absolute, so it adds
+   nothing to the header's height. */
+
+.stripWrap {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% - 6px);
+  z-index: -1;
+  display: block;
+  padding-inline: 12px;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .stripWrap {
+    padding-inline: 24px;
+  }
+}
+
+.strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  padding: 13px 16px 8px;
+  overflow: hidden;
+  border-end-start-radius: 12px;
+  border-end-end-radius: 12px;
+  /* The reference fills this band with #ff3616, where its white 10px label
+     measures 3.6:1 and fails AA. The whole ramp is shifted onto #d21f00,
+     which is the reference's own left-hand stop, so the band still reads as
+     the same red-orange and the label measures 5.3:1 at its lightest point. */
+  background: #d21f00;
+  color: #ffffff;
+  text-decoration: none;
+  pointer-events: auto;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3),
+    0 3px 3px rgba(0, 0, 0, 0.22), 0 1px 2px rgba(0, 0, 0, 0.28);
+}
+
+/* Darker at the left edge, back to the fill by 45%, warmer at the right.
+   Every stop clears 4.5:1 against the white label: 7.5, 5.3 and 6.0. */
+.stripGradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #a81800,
+    rgba(210, 31, 0, 0) 45%,
+    #c02400
+  );
+}
+
+/* The halftone. The reference screens a bitmap over this band; the same
+   effect is a dot grid multiplied over the fill and masked away to the
+   right, which needs no image request. */
+.stripTexture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(0, 0, 0, 0.9) 0.9px,
+      transparent 1.1px
+    ),
+    radial-gradient(
+      circle at 3px 3px,
+      rgba(0, 0, 0, 0.55) 0.7px,
+      transparent 0.9px
+    );
+  background-size: 4px 4px, 6px 6px;
+  -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent 75%);
+  mask-image: linear-gradient(90deg, #000 30%, transparent 75%);
+}
+
+.stripLabel {
+  position: relative;
+  font-family: var(--pida-font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stripArrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.strip:hover .stripArrow {
+  transform: translateX(2px);
+}

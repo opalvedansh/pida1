@@ -1,0 +1,201 @@
+/* Use cases: three full-width plates, divided by hairlines.
+ *
+ * See the head of UseCases.tsx for why the three-cell bento went. Short
+ * version: two cells in one row at 658px and 327px left a third of the row
+ * empty, and all three "varied" backgrounds were the same token.
+ *
+ * Nothing here is a card. The page already separates things with a hairline
+ * and space, and a capability does not become more credible for being put in
+ * a box. Each plate takes a different shape from its neighbours so the
+ * section does not read as one figure repeated three times, and so that none
+ * of them repeats the numbered index the product rail owns.
+ */
+
+.section {
+  border-bottom: 1px solid var(--pida-edge);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-5);
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+.headSub {
+  max-width: 46ch;
+}
+
+/* --------------------------------------------------------------- plate */
+
+.plate {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 3.4vw, 44px);
+}
+
+/* The hairline between plates, and the only thing dividing them. The extra
+   block margin is the plate's real separation; the rule just marks it.
+
+   Not built on the shared `hr.rule`: that selector is an element plus a
+   class, so its `margin: 0` outranks a plain class here and the plates ended
+   up 20px apart with no line between them. This carries its own reset. */
+.divider {
+  height: 0;
+  margin-block: clamp(44px, 5.5vw, 80px);
+  border: 0;
+  border-top: 1px solid var(--pida-edge);
+}
+
+/* Text beside a figure. Used by the first and third plates, which carry
+   different kinds of figure, with the full-width chart between them so the
+   section never runs the same split three times. */
+.split {
+  display: grid;
+  gap: clamp(28px, 3.4vw, 48px);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .split {
+    grid-template-columns: 5fr 7fr;
+  }
+
+  /* The first plate gives the narrower half to its figure, not the wider
+     one. At seven columns the 16:9 frame stood 423px tall against 290px of
+     text beside it, so the plate was mostly an empty media box with a hole
+     under the paragraph. At five the two columns come out close to level. */
+  .splitFigure {
+    grid-template-columns: 7fr 5fr;
+  }
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-3);
+}
+
+/* The display face at the -m step. The plates used to be set in .h3, which
+   is the body sans at 22px: at that size a capability heading sat barely
+   above its own paragraph and the section had no typographic level between
+   the section heading and body copy. */
+.plateTitle {
+  color: var(--pida-fg);
+  max-width: 26ch;
+  text-wrap: balance;
+}
+
+.body {
+  max-width: 54ch;
+  line-height: 1.6;
+  color: var(--pida-fg-muted);
+}
+
+.note {
+  color: var(--pida-fg-faint);
+}
+
+.figure {
+  min-width: 0;
+}
+
+/* --------------------------------------------------- the value plate
+ *
+ * The section's one piece of scale, and the only real figure it has: 46
+ * values from one run, one square each, across the width of the page.
+ */
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.4vw, 30px);
+}
+
+/* 46 squares. A grid rather than a fixed row, so the same markup is one
+   long band on a desktop and a block of rows on a phone without the squares
+   collapsing to 8px each. auto-fit with a floor keeps every square square. */
+.squares {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16px, 1fr));
+  gap: clamp(4px, 0.5vw, 7px);
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .squares {
+    /* 46 in one row: the count is fixed and known, so at this width it is
+       set rather than fitted, and the band reads as one run of values. */
+    grid-template-columns: repeat(46, minmax(0, 1fr));
+  }
+}
+
+.sq {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  /* The rest state. The motion layer sets the hidden state itself when it is
+     running, so with no script every square is simply drawn. */
+}
+
+/* The three states differ by fill and outline, not by hue alone, so they
+   survive greyscale and colour blindness. Matches ValueLegend exactly. */
+.sqGiven {
+  background: var(--pida-action);
+}
+
+.sqSourced {
+  box-shadow: inset 0 0 0 1.5px var(--pida-action);
+}
+
+.sqAssumed {
+  background: var(--pida-edge-strong);
+  box-shadow: inset 0 0 0 1px var(--pida-fg-faint);
+}
+
+.chartFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pida-space-4) var(--pida-space-5);
+  padding-top: var(--pida-space-4);
+  border-top: 1px solid var(--pida-edge);
+}
+
+.chartCaption {
+  margin: 0;
+}
+
+/* ------------------------------------------------------ the quotation */
+
+/* The third plate's figure is a quotation, not a picture: the worked answer
+   with its two standards named. Inset on the page's own ground with a single
+   accent rule on the leading edge, which is the one place in the section
+   that treatment is used. */
+.example {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-3);
+  padding: clamp(20px, 2.2vw, 30px);
+  border-radius: var(--pida-r-lg);
+  background: var(--pida-bg-raised);
+  border: 1px solid var(--pida-edge);
+}
+
+.exampleLabel {
+  color: var(--pida-fg-faint);
+}
+
+.exampleBody {
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 1.6;
+  color: var(--pida-fg-muted);
+}
+
+.exampleFigure {
+  font-family: var(--pida-font-mono);
+  font-weight: 500;
+  color: var(--pida-action);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

@@ -1,0 +1,200 @@
+/* Pricing. Two plans, the second raised and carrying the accent edge.
+ *
+ * The billing switch is a pair of radio inputs with their own labels. The
+ * inputs are taken out of the flow but kept focusable, so the control is
+ * reachable from the keyboard and announces itself as a radio group. The
+ * focus ring is drawn on the label, because the input itself is invisible. */
+
+.pricing {
+  border-bottom: 1px solid var(--pida-edge);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pida-space-5);
+  margin-bottom: var(--pida-space-6);
+}
+
+.headSub {
+  max-width: 46ch;
+}
+
+/* -------------------------------------------------------------- notice */
+
+.notice {
+  margin-bottom: clamp(28px, 3vw, 40px);
+  padding: var(--pida-space-4) var(--pida-space-5);
+  border: 1px solid var(--pida-action-edge);
+  border-radius: var(--pida-r-lg);
+  background: var(--pida-action-wash);
+  color: var(--pida-fg);
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 72ch;
+}
+
+.notice strong {
+  color: var(--pida-action);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------- switch */
+
+.switch {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 0 clamp(28px, 3vw, 40px);
+  padding: 3px;
+  border: 1px solid var(--pida-edge);
+  border-radius: var(--pida-r-full);
+  background: var(--pida-bg-raised);
+}
+
+.switchInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switchLabel {
+  padding: 7px 18px;
+  border-radius: var(--pida-r-full);
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--pida-fg-muted);
+  cursor: pointer;
+  transition: background-color var(--pida-dur-ui) var(--pida-ease),
+    color var(--pida-dur-ui) var(--pida-ease);
+}
+
+.switchInput:checked + .switchLabel {
+  background: var(--pida-bg-well);
+  color: var(--pida-fg);
+  box-shadow: var(--pida-shadow-chip);
+}
+
+.switchInput:focus-visible + .switchLabel {
+  outline: 2px solid var(--pida-action);
+  outline-offset: 2px;
+}
+
+/* Only one of the two price notes is shown at a time. The checked input and
+   the notes are not siblings, so this reads up to the section with :has()
+   rather than across with a sibling combinator. Ids are avoided because CSS
+   Modules rewrites them and the markup would stop matching.
+
+   Where :has() is unavailable the monthly note stays visible and the switch
+   simply does nothing, which is the correct degradation: no state is lost
+   and nothing renders empty. */
+.yearlyOnly {
+  display: none;
+}
+
+.pricing:has(.yearlyInput:checked) .monthlyOnly {
+  display: none;
+}
+
+.pricing:has(.yearlyInput:checked) .yearlyOnly {
+  display: inline;
+}
+
+/* --------------------------------------------------------------- plans */
+
+.plans {
+  display: grid;
+  gap: var(--pida-space-5);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 860px) {
+  .plans {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 2.8vw, 36px);
+  border: 1px solid var(--pida-edge);
+  border-radius: var(--pida-r-xl);
+  background: var(--pida-bg-raised);
+}
+
+.planFeatured {
+  border-color: var(--pida-action-edge);
+  background: linear-gradient(
+    to bottom,
+    var(--pida-action-wash),
+    transparent 220px
+  ),
+  var(--pida-bg-raised);
+}
+
+.planName {
+  color: var(--pida-fg);
+}
+
+.price {
+  margin-top: var(--pida-space-4);
+  font-family: var(--pida-font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--pida-fg);
+}
+
+/* While the figure is unset it is drawn as an obvious gap, not as type that
+   could be mistaken for a price. */
+.priceUnset {
+  color: var(--pida-fg-faint);
+  font-style: italic;
+}
+
+.priceNote {
+  margin-top: var(--pida-space-2);
+}
+
+.planBody {
+  margin-top: var(--pida-space-5);
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 44ch;
+}
+
+.planCta {
+  width: 100%;
+  margin-top: var(--pida-space-5);
+}
+
+.features {
+  display: grid;
+  gap: var(--pida-space-3);
+  margin-top: var(--pida-space-6);
+  padding-top: var(--pida-space-5);
+  border-top: 1px solid var(--pida-edge);
+}
+
+.featuresHead {
+  display: block;
+}
+
+.feature {
+  display: grid;
+  grid-template-columns: 15px 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--pida-fg-muted);
+}
+
+.feature svg {
+  color: var(--pida-action);
+  margin-top: 3px;
+}

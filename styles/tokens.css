@@ -1,0 +1,210 @@
+/* Design tokens.
+ *
+ * The visual language here is derived from the Hoplite landing page kept in
+ * /hoplite for reference: a single dark surface family, one hot accent, a
+ * geometric display face over a neutral sans, and one italic serif word per
+ * heading.
+ *
+ * Two locks apply to the whole site and are the reason the old per-band
+ * palette is gone:
+ *
+ *   Theme lock   every band is dark. Nothing inverts to paper mid-scroll.
+ *   Accent lock  one accent, --pida-action. Cobalt, petrol, amber and brass
+ *                are kept as aliases so older modules keep compiling, but
+ *                they all resolve to the same colour.
+ *
+ * Do not add a colour that is not in this file.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* ------------------------------------------------------------ surface
+     The ramp was oklch(17%) page, 21% raised, 14% sunken. It has been pulled
+     down four points so the page sits on the same near-black field as the
+     hero rather than lightening under it: the reference landing page is one
+     unbroken dark field from the first screen to the footer, and a 17% band
+     starting directly below a 14% hero reads as two different pages.
+
+     Still never pure #000: it flattens every shadow and edge on the page.
+     The raised and well steps come down with it, so a panel is still a
+     legible step above its ground and the hierarchy the ramp encodes is
+     unchanged. */
+  --pida-bg: oklch(13% 0 0);
+  --pida-bg-raised: oklch(19% 0 0);
+  --pida-bg-sunken: oklch(10% 0 0);
+  --pida-bg-well: oklch(23% 0 0);
+
+  /* The sunken surface again at three alphas. A gradient that runs to the
+     keyword `transparent` interpolates through transparent *black*, which
+     greys the middle of the ramp on a near-black page; running to the same
+     colour at alpha 0 keeps the ramp clean. Used by the hero scrim. */
+  --pida-scrim-solid: oklch(13% 0 0 / 1);
+  --pida-scrim-mid: oklch(13% 0 0 / 0.72);
+  --pida-scrim-none: oklch(13% 0 0 / 0);
+
+  /* ---------------------------------------------------------------- ink */
+  --pida-fg: #e5e5e5;
+  /* 0.6 and 0.56 rather than the reference's 0.6 and 0.38. Measured against
+     the raised surface, 0.38 lands at 2.8:1, which fails AA for the 11px
+     mono labels and 12px captions that use it. 0.56 measures 5.2:1. */
+  --pida-fg-muted: rgba(229, 229, 229, 0.6);
+  --pida-fg-faint: rgba(229, 229, 229, 0.56);
+
+  /* --------------------------------------------------------------- edge
+     Hairlines, not borders. Hoplite separates with a 1px #2c2c2c line and
+     almost never with a box. */
+  --pida-edge: #2c2c2c;
+  --pida-edge-strong: #3a3a3a;
+  --pida-edge-soft: rgba(229, 229, 229, 0.08);
+
+  /* ------------------------------------------------------------- accent
+     One accent for the whole page (accent lock). */
+  --pida-action: #ff3616;
+  --pida-action-soft: #ff5a33;
+  --pida-action-wash: rgba(255, 54, 22, 0.12);
+  --pida-action-edge: rgba(255, 54, 22, 0.35);
+  /* The reference sets white on this orange, which measures 3.6:1 and fails
+     AA for anything under 18px. Near-black measures 5.4:1 on the rest state
+     and 6.4:1 on hover. */
+  --pida-on-action: #1a0500;
+
+  /* Status. Used only where a state is real: the check verdict and the
+     value legend. Never decorative. */
+  --pida-ok: #4ec38a;
+  --pida-warn: #ffb224;
+  --pida-error: #ff5c47;
+
+  /* ------------------------------------------------------ legacy aliases
+     Every .module.css written before the reskin refers to these. They now
+     resolve into the dark ramp above, so those modules re-theme without
+     edits. New code should use the names above. */
+  --pida-paper: var(--pida-bg);
+  --pida-paper-2: var(--pida-bg-raised);
+  --pida-paper-cool: var(--pida-bg-raised);
+  --pida-navy: var(--pida-bg);
+  --pida-navy-2: var(--pida-bg-raised);
+  --pida-reading-room: var(--pida-bg-sunken);
+  --pida-ink: var(--pida-fg);
+  --pida-ink-2: var(--pida-fg-muted);
+  --pida-on-dark: var(--pida-fg);
+  --pida-on-dark-2: var(--pida-fg-muted);
+  --pida-rule: var(--pida-edge);
+  --pida-rule-dark: var(--pida-edge);
+  --pida-cobalt: var(--pida-action);
+  --pida-cobalt-hover: var(--pida-action-soft);
+  --pida-cobalt-on-dark: var(--pida-action);
+  --pida-petrol: var(--pida-action);
+  --pida-amber: var(--pida-action);
+  --pida-brass: var(--pida-action);
+  --pida-coral: var(--pida-action);
+
+  /* ----------------------------------------------------------------type
+     Funnel Display carries every heading at weight 400: the face is wide
+     enough that bolding it closes the counters. Bodoni Moda italic is the
+     one accent word per heading, standing in for Redaction in the
+     reference. Geist Mono carries figures and labels. */
+  --pida-font-display: "Funnel Display", "Funnel Sans", ui-sans-serif,
+    system-ui, sans-serif;
+  --pida-font-body: "Funnel Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --pida-font-accent: "Bodoni Moda", Georgia, "Times New Roman", serif;
+  --pida-font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  /* The signature of the reference: headings are painted with a radial
+     wash of the accent rising from the bottom right corner, clipped to the
+     glyphs. Everything above 52% of the ellipse falls back to flat ink. */
+  --pida-heading-wash: radial-gradient(
+      ellipse 55% 170% at 89% 100%,
+      #ff3616 0%,
+      rgba(248, 72, 44, 0.875) 6.6%,
+      rgba(241, 90, 66, 0.75) 13.2%,
+      rgba(227, 127, 111, 0.5) 26.4%,
+      rgba(199, 199, 199, 0) 52.9%
+    ),
+    linear-gradient(var(--pida-fg), var(--pida-fg));
+
+  /* -------------------------------------------------------------- shape
+     One radius scale for the page (shape lock). Cards and media take -xl,
+     controls take -md, chips take -full.
+
+     The top of the scale has been tightened: -xl from 18 to 12 and -2xl from
+     24 to 16. An 18px corner reads as a soft product card, which is the
+     opposite of the instrument chrome the hero sets, and 12px is already the
+     radius the navigation pill uses, so frames and the bar now agree. */
+  --pida-r-xs: 4px;
+  --pida-r-sm: 6px;
+  --pida-r-md: 8px;
+  --pida-r-lg: 10px;
+  --pida-r-xl: 12px;
+  --pida-r-2xl: 16px;
+  --pida-r-full: 9999px;
+  --pida-radius: var(--pida-r-md);
+
+  /* ------------------------------------------------------------- layout */
+  /* The bar's own height: 10px of wrap padding over a 48px pill (8 + a 32px
+     chip + 8). The accent strip behind it is absolutely positioned and adds
+     nothing. The hero is the one section that needs this number, because it
+     pulls itself up under the bar to start at the true top of the viewport. */
+  --pida-header-h: 58px;
+  --pida-container: 90rem;
+  --pida-gutter: 24px;
+  --pida-margin: clamp(16px, 4vw, 3.125rem);
+  --pida-section-pad: clamp(64px, 8vw, 104px);
+  --pida-measure: 62ch;
+
+  /* ------------------------------------------------------------- motion
+     No client JavaScript ships, so motion is CSS only: transitions on
+     hover and focus, and view-timeline reveals where supported. All of it
+     collapses under prefers-reduced-motion in base.css. */
+  --pida-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --pida-dur-ui: 160ms;
+  --pida-dur-reveal: 620ms;
+
+  /* -------------------------------------------------------------- depth
+     On a dark page a raised surface reads from its top highlight, not from
+     a drop shadow. */
+  --pida-shadow-frame: 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 28px -14px rgba(0, 0, 0, 0.6);
+  --pida-shadow-chip: 0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* Spacing scale, base unit 8px. */
+  --pida-space-1: 4px;
+  --pida-space-2: 8px;
+  --pida-space-3: 12px;
+  --pida-space-4: 16px;
+  --pida-space-5: 24px;
+  --pida-space-6: 32px;
+  --pida-space-7: 48px;
+  --pida-space-8: 72px;
+  --pida-space-9: 120px;
+
+  /* Layers. */
+  --pida-z-header: 100;
+  --pida-z-menu: 200;
+  --pida-z-lightbox: 300;
+
+  /* Semantic, read by base.css and every module. */
+  --bg: var(--pida-bg);
+  --fg: var(--pida-fg);
+  --fg-2: var(--pida-fg-muted);
+  --accent: var(--pida-action);
+  --rule: var(--pida-edge);
+  --focus: var(--pida-action);
+}
+
+/* The bands survive as a surface variation inside one dark theme: a section
+   may sit a step up or a step down the ramp, and never flips to light. */
+[data-theme="paper-2"],
+[data-theme="paper-cool"],
+[data-theme="raised"] {
+  --bg: var(--pida-bg-raised);
+}
+
+[data-theme="reading-room"],
+[data-theme="ink"],
+[data-theme="sunken"] {
+  --bg: var(--pida-bg-sunken);
+}
